@@ -74,7 +74,7 @@ object WorldLib
 
     def uncheckedSetBlock(world:World, pos:BlockPos, state:IBlockState)
     {
-        val ch = world.getChunkFromBlockCoords(pos)
+        val ch = world.getChunk(pos)
         val arr = ch.getBlockStorageArray
         val x = pos.getX
         val y = pos.getY
@@ -90,7 +90,7 @@ object WorldLib
 
     def uncheckedRemoveTileEntity(world:World, pos:BlockPos)
     {
-        val ch = world.getChunkFromBlockCoords(pos)
+        val ch = world.getChunk(pos)
         if (ch != null) {
             val te = ch.getTileEntityMap.remove(pos)
             if (te != null) {
@@ -102,7 +102,7 @@ object WorldLib
 
     def uncheckedSetTileEntity(world:World, pos:BlockPos, tile:TileEntity)
     {
-        val ch = world.getChunkFromBlockCoords(pos)
+        val ch = world.getChunk(pos)
         if (ch != null) {
             ch.getTileEntityMap.put(pos, tile)
             world.loadedTileEntityList.add(tile)
@@ -113,7 +113,7 @@ object WorldLib
 
     def uncheckedGetTileEntity(world:World, pos:BlockPos):TileEntity =
     {
-        val ch = world.getChunkFromBlockCoords(pos)
+        val ch = world.getChunk(pos)
         if (ch == null) return null
         ch.getTileEntityMap.get(pos)
     }

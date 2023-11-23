@@ -196,7 +196,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
         }
     }
 
-    override def onEntityCollidedWithBlock(world:World, pos:BlockPos, state:IBlockState, entity:Entity)
+    override def onEntityCollision(world:World, pos:BlockPos, state:IBlockState, entity:Entity)
     {
         world.getTileEntity(pos) match {
             case t:MTBlockTile => t.onEntityCollision(entity)

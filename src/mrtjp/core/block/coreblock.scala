@@ -36,7 +36,7 @@ class ItemBlockCore(b:Block) extends ItemBlock(b)
 
     override def getMetadata(meta:Int) = meta
 
-    override def getUnlocalizedName(stack:ItemStack) = super.getUnlocalizedName+"|"+stack.getItemDamage
+    override def getTranslationKey(stack:ItemStack) = super.getTranslationKey+"|"+stack.getItemDamage
 
     override def placeBlockAt(stack:ItemStack, player:EntityPlayer, w:World, pos:BlockPos, side:EnumFacing, hitX:Float, hitY:Float, hitZ:Float, newState:IBlockState) =
     {
