@@ -26,11 +26,11 @@ class SpriteParticle(w:World) extends CoreParticle(w) with TColourParticle with 
     override def py = prevPosY
     override def pz = prevPosZ
 
-    override def px_=(x:Double){prevPosX = x}
-    override def py_=(y:Double){prevPosY = y}
-    override def pz_=(z:Double){prevPosZ = z}
+    override def px_=(x:Double): Unit ={prevPosX = x}
+    override def py_=(y:Double): Unit ={prevPosY = y}
+    override def pz_=(z:Double): Unit ={prevPosZ = z}
 
-    override def renderParticle(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float)
+    override def renderParticle(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float): Unit =
     {
         super.renderParticle(buffer, entity, frame, cosyaw, cospitch, sinyaw, sinsinpitch, cossinpitch)
 

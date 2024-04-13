@@ -9,28 +9,28 @@ import mrtjp.core.data.{ModConfig, SpecialConfigGui, TModGuiFactory}
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
-import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.{LogManager, Logger}
 
 @Mod(modid = "mrtjpcore", useMetadata = true, modLanguage = "scala", guiFactory = "mrtjp.core.handler.GuiConfigFactory")
 object MrTJPCoreMod
 {
-    val log = LogManager.getFormatterLogger("MrTJPCore")
+    val log: Logger = LogManager.getFormatterLogger("MrTJPCore")
 
     @Mod.EventHandler
-    def preInit(event:FMLPreInitializationEvent)
+    def preInit(event:FMLPreInitializationEvent): Unit =
     {
         MrTJPConfig.loadConfig()
         MrTJPCoreProxy.preInit()
     }
 
     @Mod.EventHandler
-    def init(event:FMLInitializationEvent)
+    def init(event:FMLInitializationEvent): Unit =
     {
         MrTJPCoreProxy.init()
     }
 
     @Mod.EventHandler
-    def postInit(event:FMLPostInitializationEvent)
+    def postInit(event:FMLPostInitializationEvent): Unit =
     {
         MrTJPCoreProxy.postInit()
     }
@@ -46,7 +46,7 @@ object MrTJPConfig extends ModConfig("mrtjpcore")
 
     override def getFileName = "MrTJPCore"
 
-    override protected def initValues()
+    override protected def initValues(): Unit =
     {
         val general = new BaseCategory("General", "General settings for MrTJPCore")
         check_versions = general.put("Version Checking", check_versions, "Flag to enable or disable the update checker.")

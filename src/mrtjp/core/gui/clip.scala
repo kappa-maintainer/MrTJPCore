@@ -14,7 +14,7 @@ class ClipNode extends TNode
     var size = Size.zeroSize
     override def frame = Rect(position, size)
 
-    override protected[gui] def drawBack(mouse:Point, rframe:Float)
+    override protected[gui] def drawBack(mouse:Point, rframe:Float): Unit =
     {
         if (!hidden)
         {
@@ -34,7 +34,7 @@ class ClipNode extends TNode
         }
     }
 
-    override protected[gui] def drawFront(mouse:Point, rframe:Float)
+    override protected[gui] def drawFront(mouse:Point, rframe:Float): Unit =
     {
         if (!hidden)
         {
@@ -54,7 +54,7 @@ class ClipNode extends TNode
         }
     }
 
-    private def onChildPredraw()
+    private def onChildPredraw(): Unit =
     {
         val scaleRes = new ScaledResolution(mcInst)
         val scale = scaleRes.getScaleFactor
@@ -67,7 +67,7 @@ class ClipNode extends TNode
         GL11.glScissor(sFrame.x, sFrame.y, sFrame.width, sFrame.height)
     }
 
-    private def onChildPostdraw()
+    private def onChildPostdraw(): Unit =
     {
         GL11.glDisable(GL11.GL_SCISSOR_TEST)
     }
@@ -80,13 +80,13 @@ class ClipNode extends TNode
 
 object ClipNode
 {
-    def tempDisableScissoring()
+    def tempDisableScissoring(): Unit =
     {
         GL11.glPushAttrib(GL11.GL_SCISSOR_BIT)
         GL11.glDisable(GL11.GL_SCISSOR_TEST)
     }
 
-    def tempEnableScissoring()
+    def tempEnableScissoring(): Unit =
     {
         GL11.glPopAttrib()
     }

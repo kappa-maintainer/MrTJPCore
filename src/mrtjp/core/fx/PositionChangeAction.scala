@@ -16,17 +16,17 @@ trait TPositionedParticle extends CoreParticle
     def y:Double
     def z:Double
 
-    def x_=(x:Double){setPosition(x, y, z)}
-    def y_=(y:Double){setPosition(x, y, z)}
-    def z_=(z:Double){setPosition(x, y, z)}
+    def x_=(x:Double): Unit ={setPosition(x, y, z)}
+    def y_=(y:Double): Unit ={setPosition(x, y, z)}
+    def z_=(z:Double): Unit ={setPosition(x, y, z)}
 
     def px:Double
     def py:Double
     def pz:Double
 
-    def px_=(x:Double)
-    def py_=(y:Double)
-    def pz_=(z:Double)
+    def px_=(x:Double): Unit 
+    def py_=(y:Double): Unit 
+    def pz_=(z:Double): Unit 
 
     def dx = x-px
     def dy = y-py
@@ -35,12 +35,12 @@ trait TPositionedParticle extends CoreParticle
     def position = new Vector3(x, y, z)
     def prevPosition = new Vector3(px, py, pz)
 
-    def setPos(pos:Vector3)
+    def setPos(pos:Vector3): Unit =
     {
         setPosition(pos.x, pos.y, pos.z)
     }
 
-    def setPrevPos(pos:Vector3)
+    def setPrevPos(pos:Vector3): Unit =
     {
         px = pos.x
         py = pos.y
@@ -49,7 +49,7 @@ trait TPositionedParticle extends CoreParticle
 
     def blockPosition = new BlockPos(math.floor(x).toInt, math.floor(y).toInt, math.floor(z).toInt)
 
-    abstract override def onUpdate()
+    abstract override def onUpdate(): Unit =
     {
         super.onUpdate()
         px = x
@@ -65,7 +65,7 @@ class PositionChangeToAction extends ParticleAction
 
     override def canOperate(p:CoreParticle) = p.isInstanceOf[TPositionedParticle]
 
-    override def operate(p:CoreParticle, time:Double)
+    override def operate(p:CoreParticle, time:Double): Unit =
     {
         val pp = p.asInstanceOf[TPositionedParticle]
 
@@ -79,7 +79,7 @@ class PositionChangeToAction extends ParticleAction
         else isFinished = true
     }
 
-    override def compile(p:CoreParticle){}
+    override def compile(p:CoreParticle): Unit ={}
 
     override def copy = ParticleAction.moveTo(target.x, target.y, target.z, duration)
 }
@@ -91,14 +91,14 @@ class PositionChangeForAction extends ParticleAction
 
     override def canOperate(p:CoreParticle) = p.isInstanceOf[TPositionedParticle]
 
-    override def operate(p:CoreParticle, time:Double)
+    override def operate(p:CoreParticle, time:Double): Unit =
     {
         val pp = p.asInstanceOf[TPositionedParticle]
         if (time < duration) pp.setPos(pp.position.add(delta.copy.multiply(deltaTime(time))))
         else isFinished = true
     }
 
-    override def compile(p:CoreParticle){}
+    override def compile(p:CoreParticle): Unit ={}
 
     override def copy = ParticleAction.moveFor(delta.x, delta.y, delta.z, duration)
 }

@@ -19,7 +19,7 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.{FMLCommonHandler, Loader}
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters.*
 
 abstract class ModConfig(modID:String)
 {
@@ -85,7 +85,7 @@ abstract class ModConfig(modID:String)
     def getFileName = modID
 
     private var registered = false
-    def loadConfig()
+    def loadConfig(): Unit =
     {
         config = new Configuration(new File(Loader.instance.getConfigDir, getFileName+".cfg"))
         initValues()
@@ -99,7 +99,7 @@ abstract class ModConfig(modID:String)
     }
 
     @SubscribeEvent
-    def onConfigChanged(event:ConfigChangedEvent.OnConfigChangedEvent)
+    def onConfigChanged(event:ConfigChangedEvent.OnConfigChangedEvent): Unit =
     {
         if (event.getModID == modID)
         {
@@ -108,26 +108,26 @@ abstract class ModConfig(modID:String)
         }
     }
 
-    protected def initValues()
+    protected def initValues(): Unit 
 }
 
 object SpecialConfigGui
 {
     def buildCategories(config:Configuration):JAList[IConfigElement] =
-        new JAList[IConfigElement](config.getCategoryNames.map(s =>
+        new JAList[IConfigElement](config.getCategoryNames.asScala.map(s =>
         {
             new DummyCategoryElement(s, "", new ConfigElement(config.getCategory(s)).getChildElements)
             {
                 override def getComment = config.getCategory(s).getComment
             }
-        }))
+        }).toList.asJava)
 }
 
 class SpecialConfigGui(parent:GuiScreen, modid:String, config:Configuration) extends GuiConfig(parent, SpecialConfigGui.buildCategories(config), modid, false, false, GuiConfig.getAbridgedConfigPath(config.toString))
 
 trait TModGuiFactory extends IModGuiFactory
 {
-    override def initialize(minecraftInstance: Minecraft){}
+    override def initialize(minecraftInstance: Minecraft): Unit ={}
     override def runtimeGuiCategories() = null
     override def hasConfigGui = true
 }

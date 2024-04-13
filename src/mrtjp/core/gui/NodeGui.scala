@@ -88,7 +88,7 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
     var size = Size.zeroSize //todo initialize this to xSize x ySize
     override def frame = new Rect(position, size)
 
-    final override def initGui()
+    final override def initGui(): Unit =
     {
         super.initGui()
         position = Point(guiLeft, guiTop)
@@ -100,46 +100,46 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
         }
     }
 
-    final override def updateScreen()
+    final override def updateScreen(): Unit =
     {
         super.updateScreen()
         update()
     }
 
-    final override def drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float)
+    final override def drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float): Unit =
     {
         drawDefaultBackground()
         super.drawScreen(mouseX, mouseY, partialTicks)
         renderHoveredToolTip(mouseX, mouseY)
     }
 
-    final override def setWorldAndResolution(mc:Minecraft, i:Int, j:Int)
+    final override def setWorldAndResolution(mc:Minecraft, i:Int, j:Int): Unit =
     {
         val init = this.mc == null
         super.setWorldAndResolution(mc, i, j)
         if (init) onAddedToParent_Impl()
     }
 
-    final override def mouseClicked(x:Int, y:Int, button:Int)
+    final override def mouseClicked(x:Int, y:Int, button:Int): Unit =
     {
         super.mouseClicked(x, y, button)
         mouseClicked(new Point(x, y), button, false)
     }
 
 
-    final override def mouseReleased(x:Int, y:Int, button:Int)
+    final override def mouseReleased(x:Int, y:Int, button:Int): Unit =
     {
         super.mouseReleased(x, y, button)
         if (button != -1) mouseReleased(new Point(x, y), button, false)
     }
 
-    final override def mouseClickMove(x:Int, y:Int, button:Int, time:Long)
+    final override def mouseClickMove(x:Int, y:Int, button:Int, time:Long): Unit =
     {
         super.mouseClickMove(x, y, button, time)
         mouseDragged(new Point(x, y), button, time, false)
     }
 
-    final override def handleMouseInput()
+    final override def handleMouseInput(): Unit =
     {
         super.handleMouseInput()
         val i = Mouse.getEventDWheel
@@ -150,7 +150,7 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
         }
     }
 
-    final override def keyTyped(c:Char, keycode:Int)
+    final override def keyTyped(c:Char, keycode:Int): Unit =
     {
         if (keyPressed(c, keycode, false)) return
 
@@ -169,7 +169,7 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
     private var lastFrame = 0.0F
 
     // Front/back rendering overridden, because at root, we dont push the children to our pos, because its zero.
-    final override def drawGuiContainerBackgroundLayer(f:Float, mx:Int, my:Int)
+    final override def drawGuiContainerBackgroundLayer(f:Float, mx:Int, my:Int): Unit =
     {
         lastFrame = f
         val mouse = new Point(mx, my)
@@ -181,7 +181,7 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
         enableDepth()
     }
 
-    final override def drawGuiContainerForegroundLayer(mx:Int, my:Int)
+    final override def drawGuiContainerForegroundLayer(mx:Int, my:Int): Unit =
     {
         val mouse = new Point(mx, my)
         disableDepth()
@@ -193,7 +193,7 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
         if (debugDrawFrames)
         {
             translate(-position.x, -position.y, 0)
-            def render(node:TNode)
+            def render(node:TNode): Unit =
             {
                 if (!node.hidden)
                 {

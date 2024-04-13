@@ -120,7 +120,7 @@ class ItemQueue
 
     def ++=(that:ItemQueue) = {that.result.foreach(+=); this}
 
-    def add(item:ItemKey, amount:Int)
+    def add(item:ItemKey, amount:Int): Unit =
     {
         this += item -> amount
     }
@@ -136,14 +136,14 @@ class ItemQueue
 
     def --=(that:ItemQueue) = {that.result.foreach(-=); this}
 
-    def remove(item:ItemKey, amount:Int)
+    def remove(item:ItemKey, amount:Int): Unit =
     {
         this -= item -> amount
     }
 
     def apply(item:ItemKey):Int = collection.getOrElse(item, 0)
 
-    def clear(){collection = HashMap[ItemKey, Int]()}
+    def clear(): Unit ={collection = HashMap[ItemKey, Int]()}
 
     def isEmpty = collection.isEmpty
 

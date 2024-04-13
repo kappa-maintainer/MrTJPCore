@@ -24,7 +24,7 @@ class BeamMulti(w:World) extends CoreParticle(w) with TAlphaParticle with TColou
 
     var points = Seq.empty[Vector3]
 
-    override def renderParticle(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float)
+    override def renderParticle(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float): Unit =
     {
         super.renderParticle(buffer, entity, frame, cosyaw, cospitch, sinyaw, sinsinpitch, cossinpitch)
         if (points.size > 1)
@@ -35,7 +35,7 @@ class BeamMulti(w:World) extends CoreParticle(w) with TAlphaParticle with TColou
         }
     }
 
-    def drawBeam(buffer:BufferBuilder, p1:Vector3, p2:Vector3, f:Float)
+    def drawBeam(buffer:BufferBuilder, p1:Vector3, p2:Vector3, f:Float): Unit =
     {
         val var9 = 1.0F
         val slide = getAge

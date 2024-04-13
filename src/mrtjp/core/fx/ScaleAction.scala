@@ -16,9 +16,9 @@ trait TScalableParticle extends CoreParticle
     def scaleY = scale.y
     def scaleZ = scale.z
 
-    def scaleX_=(x:Double){scale.x = x}
-    def scaleY_=(y:Double){scale.y = y}
-    def scaleZ_=(z:Double){scale.z = z}
+    def scaleX_=(x:Double): Unit ={scale.x = x}
+    def scaleY_=(y:Double): Unit ={scale.y = y}
+    def scaleZ_=(z:Double): Unit ={scale.z = z}
 }
 
 class ScaleToAction extends ParticleAction
@@ -28,7 +28,7 @@ class ScaleToAction extends ParticleAction
 
     override def canOperate(p:CoreParticle) = p.isInstanceOf[TScalableParticle]
 
-    override def operate(p:CoreParticle, time:Double)
+    override def operate(p:CoreParticle, time:Double): Unit =
     {
         val s = p.asInstanceOf[TScalableParticle]
 
@@ -51,7 +51,7 @@ class ScaleToAction extends ParticleAction
             s.scale.set(target)
     }
 
-    override def compile(p:CoreParticle){}
+    override def compile(p:CoreParticle): Unit ={}
 
     override def copy = ParticleAction.scaleTo(target.x, target.y, target.z, duration)
 }
@@ -63,14 +63,14 @@ class ScaleForAction extends ParticleAction
 
     override def canOperate(p:CoreParticle) = p.isInstanceOf[TScalableParticle]
 
-    override def operate(p:CoreParticle, time:Double)
+    override def operate(p:CoreParticle, time:Double): Unit =
     {
         val s = p.asInstanceOf[TScalableParticle]
         if (time < duration) s.scale.add(delta.copy.multiply(deltaTime(time)))
         else isFinished = true
     }
 
-    override def compile(p:CoreParticle){}
+    override def compile(p:CoreParticle): Unit ={}
 
     override def copy = ParticleAction.scaleFor(delta.x, delta.y, delta.z, duration)
 }

@@ -7,13 +7,14 @@ package mrtjp.core.fx
 
 import mrtjp.core.fx.particles.CoreParticle
 
-import scala.collection.mutable.{Seq => MSeq}
+import scala.collection.immutable
+import scala.collection.mutable.Seq as MSeq
 
 class SequenceAction extends ParticleAction
 {
     var actions = MSeq[ParticleAction]()
 
-    override def tickLife()
+    override def tickLife(): Unit =
     {
         super.tickLife()
         actions.find(!_.isFinished) match
@@ -23,7 +24,7 @@ class SequenceAction extends ParticleAction
         }
     }
 
-    override def runOn(p:CoreParticle, frame:Float)
+    override def runOn(p:CoreParticle, frame:Float): Unit =
     {
         super.runOn(p, frame)
 
@@ -39,19 +40,19 @@ class SequenceAction extends ParticleAction
             isFinished = true
     }
 
-    override def operate(p:CoreParticle, time:Double){}
+    override def operate(p:CoreParticle, time:Double): Unit ={}
 
-    override def compile(p:CoreParticle)
+    override def compile(p:CoreParticle): Unit =
     {
         super.compile(p)
         actions.foreach(_.compile(p))
     }
 
-    override def reset()
+    override def reset(): Unit =
     {
         super.reset()
         actions.foreach(_.reset())
     }
 
-    override def copy = ParticleAction.sequence(actions.map(_.copy):_*)
+    override def copy = ParticleAction.sequence(immutable.Seq.from(actions.map(_.copy)):_*)
 }

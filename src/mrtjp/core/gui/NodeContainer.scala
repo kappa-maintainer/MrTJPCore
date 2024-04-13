@@ -14,7 +14,7 @@ import net.minecraft.inventory._
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters.*
 import scala.collection.mutable.{Buffer => MBuffer}
 
 class NodeContainer extends Container
@@ -23,7 +23,7 @@ class NodeContainer extends Container
     var stopWatchDelegate = {(p:EntityPlayer) => }
     var slotChangeDelegate = {(slot:Int) => }
 
-    def slots:MBuffer[TSlot3] = asScalaBuffer[TSlot3](inventorySlots.asInstanceOf[JList[TSlot3]])
+    def slots:MBuffer[TSlot3] = inventorySlots.asInstanceOf[JList[TSlot3]].asScala
 
     override def canInteractWith(player:EntityPlayer) = true
 
@@ -45,8 +45,8 @@ class NodeContainer extends Container
     }
 
     @SideOnly(Side.CLIENT)
-    def addPlayerInv(x:Int, y:Int){addPlayerInv(Minecraft.getMinecraft.player, x, y)}
-    def addPlayerInv(player:EntityPlayer, x:Int, y:Int)
+    def addPlayerInv(x:Int, y:Int): Unit ={addPlayerInv(Minecraft.getMinecraft.player, x, y)}
+    def addPlayerInv(player:EntityPlayer, x:Int, y:Int): Unit =
     {
         var next = 0
         def up() = {next+=1;next-1}
@@ -58,7 +58,7 @@ class NodeContainer extends Container
             addSlotToContainer(new Slot3(player.inventory, up(), x, y)) //slots
     }
 
-    override def addListener(listener:IContainerListener)
+    override def addListener(listener:IContainerListener): Unit =
     {
         super.addListener(listener)
         listener match {
@@ -69,7 +69,7 @@ class NodeContainer extends Container
     }
 
 
-    override def removeListener(listener:IContainerListener)
+    override def removeListener(listener:IContainerListener): Unit =
     {
         super.removeListener(listener)
         listener match {
@@ -79,7 +79,7 @@ class NodeContainer extends Container
         }
     }
 
-    override def onContainerClosed(p:EntityPlayer)
+    override def onContainerClosed(p:EntityPlayer): Unit =
     {
         super.onContainerClosed(p)
         if (!p.world.isRemote)
@@ -247,7 +247,7 @@ class NodeContainer extends Container
 
             import scala.util.control.Breaks._
             breakable
-            {
+              {
                 while(!reverse && k < end || reverse && k >= start)
                 {
                     slot = slots(k)
@@ -279,7 +279,7 @@ class NodeContainer extends Container
     }
 
     //Hack to allow empty containers for use with guis without inventories
-    override def putStackInSlot(slot:Int, stack:ItemStack)
+    override def putStackInSlot(slot:Int, stack:ItemStack): Unit =
     {
         if (inventorySlots.isEmpty || inventorySlots.size < slot) return
         else super.putStackInSlot(slot, stack)
@@ -292,7 +292,7 @@ class Slot3(inv:IInventory, i:Int, x:Int, y:Int) extends Slot(inv, i, x, y) with
     override def canTakeStack(player:EntityPlayer):Boolean = canRemoveDelegate()
     override def isItemValid(stack:ItemStack):Boolean = canPlaceDelegate(stack)
 
-    override def onSlotChanged()
+    override def onSlotChanged(): Unit =
     {
         super.onSlotChanged()
         slotChangeDelegate()

@@ -86,7 +86,7 @@ object GuiHandler
       * @param guiID Gui ID defined in GuiIDs object
       * @param dataWrite Partial function that adds data to a packet
       */
-    private[gui] def openSMPContainer(player1:EntityPlayer, cont:Container, guiID:Int, dataWrite:MCDataOutput => Unit)
+    private[gui] def openSMPContainer(player1:EntityPlayer, cont:Container, guiID:Int, dataWrite:MCDataOutput => Unit): Unit =
     {
         if (!player1.isInstanceOf[EntityPlayerMP]) return
         val player = player1.asInstanceOf[EntityPlayerMP]
@@ -111,7 +111,7 @@ object GuiHandler
       * @param gui The gui created by the client
       */
     @SideOnly(Side.CLIENT)
-    private[gui] def openSMPContainer(windowID:Int, gui:GuiScreen)
+    private[gui] def openSMPContainer(windowID:Int, gui:GuiScreen): Unit =
     {
         val mc = Minecraft.getMinecraft
         mc.displayGuiScreen(gui)
@@ -126,7 +126,7 @@ object GuiHandler
       *             guiID as short, as well as custom gui data.
       */
     @SideOnly(Side.CLIENT)
-    private[core] def receiveGuiPacket(data:MCDataInput)
+    private[core] def receiveGuiPacket(data:MCDataInput): Unit =
     {
         val win = data.readUByte()
         val id = data.readUShort()
@@ -139,7 +139,7 @@ object GuiHandler
     }
 
     @deprecated("register(factory:TGuiFactory)")
-    def register(factory:TGuiFactory, id:Int) {
+    def register(factory:TGuiFactory, id:Int): Unit = {
         assert(factory.getID == id)
         register(factory)
     }
@@ -151,7 +151,7 @@ object GuiHandler
       * @param factory The factory to register
       * @throws RuntimeException If a factory with the same [[TGuiFactory.getID ID]] is already registered.
       */
-    def register(factory:TGuiFactory) {
+    def register(factory:TGuiFactory): Unit = {
 
         if (guiMap.contains(factory.getID))
             throw new RuntimeException(s"There is a factory already registered with ID ${factory.getID}.")
@@ -193,7 +193,7 @@ trait TGuiFactory
       * @param player The player to send the open request to.
       * @param cont The container for this GUI, if it has one. Can be null if none.
       */
-    final def open(player:EntityPlayer, cont:Container) { open(player, cont, {_ => }) }
+    final def open(player:EntityPlayer, cont:Container): Unit = { open(player, cont, {_ => }) }
 
     /**
       * Server-side function that will send an open request to the client. This will trigger a call to this factory's
@@ -204,7 +204,7 @@ trait TGuiFactory
       * @param dataWrite A function to write custom data into this open request. It will be passed to the client's
       *                  [[buildGui() GUI build function]].
       */
-    final def open(player:EntityPlayer, cont:Container, dataWrite:MCDataOutput => Unit)
+    final def open(player:EntityPlayer, cont:Container, dataWrite:MCDataOutput => Unit): Unit =
     {
         GuiHandler.openSMPContainer(player, cont, getID, dataWrite)
     }

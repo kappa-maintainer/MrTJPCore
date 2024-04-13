@@ -11,13 +11,13 @@ class DelayAction extends ParticleAction
 {
     var delay = -1.0
 
-    override def operate(p:CoreParticle, time:Double)
+    override def operate(p:CoreParticle, time:Double): Unit =
     {
         if (time > delay)
             isFinished = true
     }
 
-    override def compile(p:CoreParticle){}
+    override def compile(p:CoreParticle): Unit ={}
 
     override def copy = ParticleAction.delay(delay)
 }

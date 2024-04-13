@@ -41,7 +41,7 @@ object SimpleGenHandler extends IWorldGenerator
     private val retroGen = MrTJPConfig.retro_gen
     private val tagDB = "RetrogenData_"+MrTJPConfig.retro_gen_id
 
-    def init()
+    def init(): Unit =
     {
         GameRegistry.registerWorldGenerator(this, 0)
         MinecraftForge.EVENT_BUS.register(this)
@@ -50,7 +50,7 @@ object SimpleGenHandler extends IWorldGenerator
         if (retroGen) MinecraftForge.EVENT_BUS.register(this)
     }
 
-    def registerStructure(struct:ISimpleStructureGen)
+    def registerStructure(struct:ISimpleStructureGen): Unit =
     {
         if (structures.exists(_.genID == struct.genID))
             log.error("MrTJP Structure gen duplicate structure '%s'", struct.genID)
@@ -62,7 +62,7 @@ object SimpleGenHandler extends IWorldGenerator
     }
 
     @SubscribeEvent
-    def chunkSaveEvent(event:ChunkDataEvent.Save)
+    def chunkSaveEvent(event:ChunkDataEvent.Save): Unit =
     {
         val genNBT = event.getData.getCompoundTag(tagDB)
 
@@ -75,7 +75,7 @@ object SimpleGenHandler extends IWorldGenerator
     }
 
     @SubscribeEvent
-    def chunkLoadEvent(event:ChunkDataEvent.Load)
+    def chunkLoadEvent(event:ChunkDataEvent.Load): Unit =
     {
         if (retroGen)
         {
@@ -93,12 +93,12 @@ object SimpleGenHandler extends IWorldGenerator
         }
     }
 
-    override def generate(rand:Random, chunkX:Int, chunkZ:Int, world:World, g:IChunkGenerator, p:IChunkProvider)
+    override def generate(rand:Random, chunkX:Int, chunkZ:Int, world:World, g:IChunkGenerator, p:IChunkProvider): Unit =
     {
         subGenerate(world, chunkX, chunkZ, rand, false)
     }
 
-    private def subGenerate(w:World, chunkX:Int, chunkZ:Int, rand:Random, isRetro:Boolean, existingStructs:Set[String] = Set.empty)
+    private def subGenerate(w:World, chunkX:Int, chunkZ:Int, rand:Random, isRetro:Boolean, existingStructs:Set[String] = Set.empty): Unit =
     {
         var gen = false
         for (s <- structures) if (!existingStructs.contains(s.genID))
@@ -108,7 +108,7 @@ object SimpleGenHandler extends IWorldGenerator
     }
 
     @SubscribeEvent
-    def tickEnd(event:WorldTickEvent)
+    def tickEnd(event:WorldTickEvent): Unit =
     {
         if (event.side != Side.SERVER || event.phase != Phase.END) return
 

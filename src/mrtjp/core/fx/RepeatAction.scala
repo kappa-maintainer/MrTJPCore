@@ -9,21 +9,21 @@ import mrtjp.core.fx.particles.CoreParticle
 
 class RepeatAction extends ParticleAction
 {
-    var repeatTimes = -1
-    var action:ParticleAction = null
+    var repeatTimes: Int = -1
+    var action :ParticleAction = null
 
     private var iter = 0
 
     override def canOperate(p:CoreParticle) =
         super.canOperate(p) && action.canOperate(p)
 
-    override def tickLife()
+    override def tickLife(): Unit =
     {
         super.tickLife()
         action.tickLife()
     }
 
-    override def runOn(p:CoreParticle, frame:Float)
+    override def runOn(p:CoreParticle, frame:Float): Unit =
     {
         super.runOn(p, frame)
 
@@ -41,15 +41,15 @@ class RepeatAction extends ParticleAction
             isFinished = true
     }
 
-    override def operate(p:CoreParticle, time:Double){}
+    override def operate(p:CoreParticle, time:Double): Unit ={}
 
-    override def compile(p:CoreParticle)
+    override def compile(p:CoreParticle): Unit =
     {
         super.compile(p)
         action.compile(p)
     }
 
-    override def reset()
+    override def reset(): Unit =
     {
         super.reset()
         iter = 0
@@ -63,13 +63,13 @@ class RepeatForeverAction extends ParticleAction
 {
     var action:ParticleAction = null
 
-    override def tickLife()
+    override def tickLife(): Unit =
     {
         super.tickLife()
         action.tickLife()
     }
 
-    override def runOn(p:CoreParticle, frame:Float)
+    override def runOn(p:CoreParticle, frame:Float): Unit =
     {
         super.runOn(p, frame)
 
@@ -78,15 +78,15 @@ class RepeatForeverAction extends ParticleAction
             action.reset()
     }
 
-    override def operate(p:CoreParticle, time:Double){}
+    override def operate(p:CoreParticle, time:Double): Unit ={}
 
-    override def compile(p:CoreParticle)
+    override def compile(p:CoreParticle): Unit =
     {
         super.compile(p)
         action.compile(p)
     }
 
-    override def reset()
+    override def reset(): Unit =
     {
         super.reset()
         action.reset()

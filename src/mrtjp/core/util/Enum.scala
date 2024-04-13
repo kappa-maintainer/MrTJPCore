@@ -5,10 +5,11 @@
  */
 package mrtjp.core.util
 
+import scala.annotation.unchecked.uncheckedVariance
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.BitSet
-import scala.collection.mutable.{BitSet => MBitSet, Builder => MBuilder}
-import scala.collection.{SortedSetLike, immutable}
+import scala.collection.mutable.{BitSet as MBitSet, Builder as MBuilder}
+import scala.collection.{BuildFrom, immutable, mutable}
 
 trait Enum
 {
@@ -73,7 +74,6 @@ trait Enum
 
     class ValSet(var set:BitSet) extends Set[EnumVal]
     with immutable.SortedSet[EnumVal]
-    with SortedSetLike[EnumVal, ValSet]
     with Serializable
     {
         implicit def ordering = ValOrdering
@@ -83,11 +83,16 @@ trait Enum
             new ValSet(set.rangeImpl(from.map(_.ordinal), until.map(_.ordinal)))
 
         override def contains(elem:EnumVal) = set contains elem.ordinal
-        override def +(elem:EnumVal) = new ValSet(set + elem.ordinal)
-        override def -(elem:EnumVal) = new ValSet(set - elem.ordinal)
+        //override def +(elem:EnumVal) = new ValSet(set + elem.ordinal)
+        //override def -(elem:EnumVal) = new ValSet(set - elem.ordinal)
         override def iterator = set.iterator map (id => thisenum(id))
         override def keysIteratorFrom(start: EnumVal) =
             throw new NotImplementedError("Please report this crash")
+
+        // Members declared in scala.collection.immutable.SetOps
+        def excl (elem: Enum.this.EnumVal): scala.collection.immutable.SortedSet[Enum.this.EnumVal] = new ValSet(set - elem.ordinal)
+        def incl (elem: Enum.this.EnumVal): scala.collection.immutable.SortedSet[Enum.this.EnumVal] = new ValSet(set + elem.ordinal)
+        def iteratorFrom (start: Enum.this.EnumVal @uncheckedVariance): Iterator[Enum.this.EnumVal @uncheckedVariance] = ???
     }
 
     object ValSet
@@ -99,15 +104,15 @@ trait Enum
         def newBuilder = new MBuilder[EnumVal, ValSet]
         {
             private val b = new MBitSet
-            def +=(x:EnumVal) = {b += x.ordinal; this}
+            def addOne(x:EnumVal) = {b += x.ordinal; this}
             def clear() = b.clear()
             def result() = new ValSet(b.toImmutable)
         }
 
-        implicit def canBuildFrom = new CanBuildFrom[ValSet, EnumVal, ValSet]
-        {
-            def apply(from:ValSet) = newBuilder
+        implicit def canBuildFrom(): BuildFrom[_, _, _] = new CanBuildFrom[ValSet, EnumVal, ValSet] {
             def apply() = newBuilder
+            def fromSpecific (from: Enum.this.ValSet) (it: IterableOnce[Enum.this.EnumVal]): Enum.this.ValSet = ???
+            def newBuilder (from: Enum.this.ValSet): scala.collection.mutable.Builder[Enum.this.EnumVal, Enum.this.ValSet] = ???
         }
     }
 }

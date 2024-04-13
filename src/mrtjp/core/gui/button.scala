@@ -12,7 +12,7 @@ import net.minecraft.client.audio.PositionedSoundRecord
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.SoundEvents
 
-import scala.collection.convert.WrapAsJava
+import scala.jdk.CollectionConverters.*
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -25,7 +25,7 @@ class ButtonNode extends TNode
     override def frame = Rect(position, size)
 
     var clickDelegate = {() => ()}
-    var tooltipBuilder = {_:ListBuffer[String] => ()}
+    var tooltipBuilder = {(_:ListBuffer[String]) => ()}
     var drawFunction = {() => ()}
 
     var mouseoverLock =  false
@@ -41,12 +41,12 @@ class ButtonNode extends TNode
         else false
     }
 
-    def onButtonClicked()
+    def onButtonClicked(): Unit =
     {
         clickDelegate()
     }
 
-    override def drawBack_Impl(mouse:Point, rframe:Float)
+    override def drawBack_Impl(mouse:Point, rframe:Float): Unit =
     {
         GlStateManager.color(1, 1, 1, 1)
         val mouseover = mouseoverLock || (frame.contains(mouse) && rayTest(mouse))
@@ -54,7 +54,7 @@ class ButtonNode extends TNode
         drawButton(mouseover)
     }
 
-    override def drawFront_Impl(mouse:Point, rframe:Float)
+    override def drawFront_Impl(mouse:Point, rframe:Float): Unit =
     {
         if (rayTest(mouse))
         {
@@ -64,13 +64,13 @@ class ButtonNode extends TNode
             //draw tooltip with absolute coords to allow it to force-fit on screen
             translateToScreen()
             val Point(mx, my) = parent.convertPointToScreen(mouse)
-            GuiDraw.drawMultiLineTip(mx+12, my-12, WrapAsJava.seqAsJavaList(list))
+            GuiDraw.drawMultiLineTip(mx+12, my-12, list.asJava)
             translateFromScreen()
         }
     }
 
-    def drawButtonBackground(mouseover:Boolean){}
-    def drawButton(mouseover:Boolean){}
+    def drawButtonBackground(mouseover:Boolean): Unit ={}
+    def drawButton(mouseover:Boolean): Unit ={}
 }
 
 /**
@@ -78,7 +78,7 @@ class ButtonNode extends TNode
  */
 trait TButtonMC extends ButtonNode
 {
-    abstract override def drawButtonBackground(mouseover:Boolean)
+    abstract override def drawButtonBackground(mouseover:Boolean): Unit =
     {
         super.drawButtonBackground(mouseover)
 
@@ -102,7 +102,7 @@ trait TButtonText extends ButtonNode
     var text = ""
     def setText(t:String):this.type = {text = t; this}
 
-    abstract override def drawButton(mouseover:Boolean)
+    abstract override def drawButton(mouseover:Boolean): Unit =
     {
         super.drawButton(mouseover)
         GuiDraw.drawStringC(text, position.x+size.width/2, position.y+(size.height-8)/2, if (mouseover) 0xFFFFFFA0 else 0xFFE0E0E0)
@@ -117,7 +117,7 @@ class DotSelectNode extends ButtonNode
 {
     size = Size(8, 8)
 
-    override def drawButtonBackground(mouseover:Boolean)
+    override def drawButtonBackground(mouseover:Boolean): Unit =
     {
         super.drawButtonBackground(mouseover)
         TextureUtils.changeTexture(GuiLib.guiExtras)
@@ -145,7 +145,7 @@ class CheckBoxNode extends ButtonNode with TButtonMC
 
     var state = false
 
-    override def drawButton(mouseover:Boolean)
+    override def drawButton(mouseover:Boolean): Unit =
     {
         super.drawButton(mouseover)
         TextureUtils.changeTexture(GuiLib.guiExtras)
@@ -153,7 +153,7 @@ class CheckBoxNode extends ButtonNode with TButtonMC
         drawTexturedModalRect(position.x, position.y, u, 134, 14, 14)
     }
 
-    override def onButtonClicked()
+    override def onButtonClicked(): Unit =
     {
         state = !state
         super.onButtonClicked()

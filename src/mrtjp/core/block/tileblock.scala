@@ -32,7 +32,7 @@ import net.minecraft.world.{Explosion, IBlockAccess, World}
 import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters.*
 import scala.collection.mutable.ListBuffer
 
 object MultiTileBlock
@@ -54,11 +54,11 @@ class MultiTileBlock(mat:Material) extends Block(mat)
             case _ => state
         }
 
-    override def getMetaFromState(state:IBlockState) = state.getValue(TILE_INDEX)
+    override def getMetaFromState(state:IBlockState) = state.getValue(TILE_INDEX.asInstanceOf[IProperty[Nothing]])
 
     override def getStateFromMeta(meta:Int) = getDefaultState.withProperty(TILE_INDEX, (meta%16).asInstanceOf[Integer])
 
-    def addTile[A <: MTBlockTile](t:Class[A], index:Int)
+    def addTile[A <: MTBlockTile](t:Class[A], index:Int): Unit =
     {
         tiles(index) = t
         GameRegistry.registerTileEntity(t, getRegistryName.toString+"|"+index)
@@ -86,7 +86,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
 
     override def getTickRandomly = true
 
-    override def addCollisionBoxToList(state:IBlockState, world:World, pos:BlockPos, entityBox:AxisAlignedBB, collidingBoxes:JList[AxisAlignedBB], entity:Entity, p_185477_7_ :Boolean)
+    override def addCollisionBoxToList(state:IBlockState, world:World, pos:BlockPos, entityBox:AxisAlignedBB, collidingBoxes:JList[AxisAlignedBB], entity:Entity, p_185477_7_ :Boolean): Unit =
     {
         world.getTileEntity(pos) match {
             case t:MTBlockTile =>
@@ -146,14 +146,14 @@ class MultiTileBlock(mat:Material) extends Block(mat)
             val b = state.getBlock
             if (b.canHarvestBlock(world, pos, player) && !player.capabilities.isCreativeMode) {
                 val stacks = getDrops(world, pos, state, EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, player.getHeldItemMainhand))
-                for (stack <- stacks) WorldLib.dropItem(world, pos, stack)
+                for (stack <- stacks.asScala) WorldLib.dropItem(world, pos, stack)
             }
             world.setBlockToAir(pos)
             true
         }
     }
 
-    override def breakBlock(world:World, pos:BlockPos, state:IBlockState)
+    override def breakBlock(world:World, pos:BlockPos, state:IBlockState): Unit =
     {
         val tile = world.getTileEntity(pos)
         super.breakBlock(world, pos, state)
@@ -163,7 +163,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
         }
     }
 
-    override def harvestBlock(worldIn:World, player:EntityPlayer, pos:BlockPos, state:IBlockState, te:TileEntity, stack:ItemStack){}
+    override def harvestBlock(worldIn:World, player:EntityPlayer, pos:BlockPos, state:IBlockState, te:TileEntity, stack:ItemStack): Unit ={}
 
     override def getDrops(world:IBlockAccess, pos:BlockPos, state:IBlockState, fortune:Int) =
     {
@@ -172,7 +172,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
             case t:MTBlockTile => t.addHarvestContents(list)
             case _ =>
         }
-        new JArrayList[ItemStack](list)
+        list.asJava
     }
 
     override def getPickBlock(state:IBlockState, target:RayTraceResult, world:World, pos:BlockPos, player:EntityPlayer) =
@@ -188,7 +188,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
             case _ => false
         }
 
-    override def onBlockClicked(world:World, pos:BlockPos, player:EntityPlayer)
+    override def onBlockClicked(world:World, pos:BlockPos, player:EntityPlayer): Unit =
     {
         world.getTileEntity(pos) match {
             case t:MTBlockTile => t.onBlockClicked(player)
@@ -196,7 +196,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
         }
     }
 
-    override def onEntityCollision(world:World, pos:BlockPos, state:IBlockState, entity:Entity)
+    override def onEntityCollision(world:World, pos:BlockPos, state:IBlockState, entity:Entity): Unit =
     {
         world.getTileEntity(pos) match {
             case t:MTBlockTile => t.onEntityCollision(entity)
@@ -209,7 +209,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
             case t:MTBlockTile => t.onEntityWalk(entity)
         }
 
-    override def neighborChanged(state:IBlockState, world:World, pos:BlockPos, blockIn:Block, fromPos:BlockPos)
+    override def neighborChanged(state:IBlockState, world:World, pos:BlockPos, blockIn:Block, fromPos:BlockPos): Unit =
     {
         world.getTileEntity(pos) match {
             case t:MTBlockTile => t.onNeighborBlockChange()
@@ -217,7 +217,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
         }
     }
 
-    override def onNeighborChange(world:IBlockAccess, pos:BlockPos, neighbor:BlockPos)
+    override def onNeighborChange(world:IBlockAccess, pos:BlockPos, neighbor:BlockPos): Unit =
     {
         world.getTileEntity(pos) match {
             case t:MTBlockTile => t.onNeighborTileChange(neighbor)
@@ -225,7 +225,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
         }
     }
 
-    override def onBlockPlacedBy(world:World, pos:BlockPos, state:IBlockState, placer:EntityLivingBase, stack:ItemStack)
+    override def onBlockPlacedBy(world:World, pos:BlockPos, state:IBlockState, placer:EntityLivingBase, stack:ItemStack): Unit =
     {
         val meta = state.getBlock.getMetaFromState(state)
         if (tiles.isDefinedAt(meta) && tiles(meta) != null)
@@ -234,7 +234,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
             throw new RuntimeException("MultiTileBlock "+this.getRegistryName+" was placed w/ invalid metadata. Most likely an invalid return value on this block's ItemBlock#getMetadata")
     }
 
-    def postBlockSetup(w:World, pos:BlockPos, side:Int, player:EntityPlayer, stack:ItemStack, hit:Vector3)
+    def postBlockSetup(w:World, pos:BlockPos, side:Int, player:EntityPlayer, stack:ItemStack, hit:Vector3): Unit =
     {
         w.getTileEntity(pos) match {
             case t:MTBlockTile => t.onBlockPlaced(side, player, stack)
@@ -281,14 +281,14 @@ class MultiTileBlock(mat:Material) extends Block(mat)
         }
 
     @SideOnly(Side.CLIENT)
-    override def getSubBlocks(tab:CreativeTabs, list:NonNullList[ItemStack])
+    override def getSubBlocks(tab:CreativeTabs, list:NonNullList[ItemStack]): Unit =
     {
         for (i <- tiles.indices) if (tiles(i) != null)
             list.add(new ItemStack(this, 1, i))
     }
 
     @SideOnly(Side.CLIENT)
-    override def randomDisplayTick(state:IBlockState, world:World, pos:BlockPos, rand:Random)
+    override def randomDisplayTick(state:IBlockState, world:World, pos:BlockPos, rand:Random): Unit =
     {
         world.getTileEntity(pos) match {
             case t:MTBlockTile => t.randomDisplayTick(rand)
@@ -303,7 +303,7 @@ trait TTileOrient extends MTBlockTile
 
     def side = orientation>>2
 
-    def setSide(s:Int)
+    def setSide(s:Int): Unit =
     {
         val oldOrient = orientation
         orientation = (orientation&0x3|s<<2).toByte
@@ -312,7 +312,7 @@ trait TTileOrient extends MTBlockTile
 
     def rotation = orientation&0x3
 
-    def setRotation(r:Int)
+    def setRotation(r:Int): Unit =
     {
         val oldOrient = orientation
         orientation = (orientation&0xFC|r).toByte
@@ -323,7 +323,7 @@ trait TTileOrient extends MTBlockTile
 
     def rotationT = Rotation.sideOrientation(side, rotation).at(Vector3.center)
 
-    def onOrientChanged(oldOrient:Int){}
+    def onOrientChanged(oldOrient:Int): Unit ={}
 
     // internal r from absRot
     def toInternal(absRot:Int) = (absRot+6-rotation)%4
@@ -342,13 +342,13 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
 {
     protected var schedTick = -1L
 
-    def onBlockPlaced(side:Int, player:EntityPlayer, stack:ItemStack){}
+    def onBlockPlaced(side:Int, player:EntityPlayer, stack:ItemStack): Unit ={}
 
-    def onBlockRemoval(){}
+    def onBlockRemoval(): Unit ={}
 
-    def onNeighborBlockChange(){}
+    def onNeighborBlockChange(): Unit ={}
 
-    def onNeighborTileChange(neighbor:BlockPos){}
+    def onNeighborTileChange(neighbor:BlockPos): Unit ={}
 
     def getWeakChanges = false
 
@@ -372,30 +372,30 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
 
     def onBlockClicked(player:EntityPlayer) = false
 
-    def onEntityCollision(ent:Entity){}
+    def onEntityCollision(ent:Entity): Unit ={}
 
-    def onEntityWalk(ent:Entity){}
+    def onEntityWalk(ent:Entity): Unit ={}
 
     def getBlockBounds = Cuboid6.full
 
     def getCollisionBounds = Cuboid6.full
 
-    def onScheduledTick(){}
+    def onScheduledTick(): Unit ={}
 
-    def updateClient(){}
+    def updateClient(): Unit ={}
 
-    def updateServer(){}
+    def updateServer(): Unit ={}
 
-    def randomTick(rand:Random){}
+    def randomTick(rand:Random): Unit ={}
 
     @SideOnly(Side.CLIENT)
-    def randomDisplayTick(rand:Random){}
+    def randomDisplayTick(rand:Random): Unit ={}
 
     def getBlock:Block
 
     def getPickBlock = new ItemStack(getBlock, 1, getBlockMetadata)
 
-    def addHarvestContents(ist:ListBuffer[ItemStack])
+    def addHarvestContents(ist:ListBuffer[ItemStack]): Unit =
     {
         ist += getPickBlock
     }
@@ -404,7 +404,7 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
     def y = getPos.getY
     def z = getPos.getZ
 
-    def scheduleTick(time:Int)
+    def scheduleTick(time:Int): Unit =
     {
         val tn = world.getTotalWorldTime+time
         if (schedTick > 0L && schedTick < tn) return
@@ -414,7 +414,7 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
 
     def isTickScheduled = schedTick >= 0L
 
-    def breakBlock_do()
+    def breakBlock_do(): Unit =
     {
         val il = new ListBuffer[ItemStack]
         addHarvestContents(il)
@@ -422,22 +422,22 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
         world.setBlockToAir(pos)
     }
 
-    override def markDirty()
+    override def markDirty(): Unit =
     {
         world.markChunkDirty(pos, this)
     }
 
-    final def markRender()
+    final def markRender(): Unit =
     {
         world.markBlockRangeForRenderUpdate(pos, pos)
     }
 
-    final def markLight()
+    final def markLight(): Unit =
     {
         world.checkLight(pos)
     }
 
-    final def markDescUpdate()
+    final def markDescUpdate(): Unit =
     {
 //        val state = world.getBlockState(pos)
 //        world.notifyBlockUpdate(pos, state, state, 3)
@@ -446,7 +446,7 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
         sendWriteStream(packet)
     }
 
-    final override def update()
+    final override def update(): Unit =
     {
         if (world.isRemote) {
             updateClient()
@@ -471,7 +471,7 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
         tag
     }
 
-    final override def readFromNBT(tag:NBTTagCompound)
+    final override def readFromNBT(tag:NBTTagCompound): Unit =
     {
         super.readFromNBT(tag)
         schedTick = tag.getLong("sched")
@@ -491,27 +491,27 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
         out.toNBTTag(tag)
         tag
     }
-    override def handleUpdateTag(tag:NBTTagCompound)
+    override def handleUpdateTag(tag:NBTTagCompound): Unit =
     {
         super.handleUpdateTag(tag)
         val in = PacketCustom.fromNBTTag(tag)
         readDesc(in)
     }
     override def getUpdatePacket = new SPacketUpdateTileEntity(pos, 0, getUpdateTag)
-    override def onDataPacket(net:NetworkManager, pkt:SPacketUpdateTileEntity)
+    override def onDataPacket(net:NetworkManager, pkt:SPacketUpdateTileEntity): Unit =
     {
         handleUpdateTag(pkt.getNbtCompound)
     }
 
-    def save(tag:NBTTagCompound){}
+    def save(tag:NBTTagCompound): Unit ={}
 
-    def load(tag:NBTTagCompound){}
+    def load(tag:NBTTagCompound): Unit ={}
 
-    def writeDesc(out:MCDataOutput){}
+    def writeDesc(out:MCDataOutput): Unit ={}
 
-    def readDesc(in:MCDataInput){}
+    def readDesc(in:MCDataInput): Unit ={}
 
-    final override def readFromPacket(packet:MCDataInput)
+    final override def readFromPacket(packet:MCDataInput): Unit =
     {
         packet.readUByte() match {
             case 0 => readDesc(packet)
@@ -519,12 +519,12 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
         }
     }
 
-    final override def writeToPacket(packet:MCDataOutput)
+    final override def writeToPacket(packet:MCDataOutput): Unit =
     {
         writeDesc(packet.writeByte(0))
     }
 
-    def read(in:MCDataInput, key:Int){}
+    def read(in:MCDataInput, key:Int): Unit ={}
 
     final def writeStream(key:Int):PacketCustom =
     {
@@ -533,7 +533,7 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
         stream
     }
 
-    final def sendWriteStream(packet:PacketCustom)
+    final def sendWriteStream(packet:PacketCustom): Unit =
     {
         packet.sendToChunk(world, x>>4, z>>4)
     }

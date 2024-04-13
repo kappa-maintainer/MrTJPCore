@@ -23,7 +23,7 @@ class BlockCore(mat:Material) extends Block(mat)
 {
     def getItemBlockClass:Class[_ <: ItemBlock] = classOf[ItemBlockCore]
 
-    def bindTile[A <: TileEntity](c:Class[A])
+    def bindTile[A <: TileEntity](c:Class[A]): Unit =
     {
         GameRegistry.registerTileEntity(c, getRegistryName.toString)
     }

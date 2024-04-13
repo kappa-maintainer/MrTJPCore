@@ -25,7 +25,7 @@ class MrTJPCorePH
     val guiPacket = 3
     val keyBindPacket = 4
 
-    def handleTilePacket(world:World, packet:PacketCustom, pos:BlockPos)
+    def handleTilePacket(world:World, packet:PacketCustom, pos:BlockPos): Unit =
     {
         world.getTileEntity(pos) match {
             case cpt:ICustomPacketTile => cpt.readFromPacket(packet)
@@ -33,7 +33,7 @@ class MrTJPCorePH
         }
     }
 
-    def sendTilePacket(world:World, pos:BlockPos, packet:PacketCustom)
+    def sendTilePacket(world:World, pos:BlockPos, packet:PacketCustom): Unit =
     {
 
     }
@@ -41,7 +41,7 @@ class MrTJPCorePH
 
 object MrTJPCoreCPH extends MrTJPCorePH with IClientPacketHandler
 {
-    def handlePacket(packet:PacketCustom, mc:Minecraft, nethandler:INetHandlerPlayClient)
+    def handlePacket(packet:PacketCustom, mc:Minecraft, nethandler:INetHandlerPlayClient): Unit =
     {
         val world = mc.world
         packet.getType match {
@@ -54,7 +54,7 @@ object MrTJPCoreCPH extends MrTJPCorePH with IClientPacketHandler
 
 object MrTJPCoreSPH extends MrTJPCorePH with IServerPacketHandler
 {
-    override def handlePacket(packet:PacketCustom, sender:EntityPlayerMP, nethandler:INetHandlerPlayServer)
+    override def handlePacket(packet:PacketCustom, sender:EntityPlayerMP, nethandler:INetHandlerPlayServer): Unit =
     {
         packet.getType match
         {
