@@ -104,7 +104,7 @@ object SimpleGenHandler extends IWorldGenerator
         for (s <- structures) if (!existingStructs.contains(s.genID))
             gen |= s.generate(w, chunkX, chunkZ, rand, isRetro)
 
-        if (isRetro && gen) w.getChunkFromChunkCoords(chunkX, chunkZ).setModified(true)
+        if (isRetro && gen) w.getChunk(chunkX, chunkZ).setModified(true)
     }
 
     @SubscribeEvent

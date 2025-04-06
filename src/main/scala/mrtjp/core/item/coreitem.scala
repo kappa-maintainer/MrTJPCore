@@ -23,9 +23,9 @@ import scala.collection.JavaConversions._
 
 class ItemCore extends Item
 {
-    override def getUnlocalizedName(stack:ItemStack):String =
-        if (hasSubtypes) getUnlocalizedName()+"|"+stack.getItemDamage
-        else getUnlocalizedName()
+    override def getTranslationKey(stack:ItemStack):String =
+        if (hasSubtypes) getTranslationKey()+"|"+stack.getItemDamage
+        else getTranslationKey()
 }
 
 /**
@@ -62,7 +62,7 @@ abstract class ItemDefinition extends Enum
 
         metaToDef += meta -> this.asInstanceOf[EnumVal]
 
-        override def name = getItem.getUnlocalizedName(makeStack)
+        override def name = getItem.getTranslationKey(makeStack)
         def getVariantName:String = variantName
 
         override def getName: String = variantName.toLowerCase

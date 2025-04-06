@@ -1,179 +1,197 @@
-import org.apache.tools.ant.filters.ReplaceTokens
+import org.jetbrains.changelog.Changelog
+import org.jetbrains.gradle.ext.Gradle
 
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
+plugins {
+    id 'java'
+    id 'scala'
+    id 'java-library'
+    id 'maven-publish'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1.10'
+    id 'org.jetbrains.changelog' version '2.2.1'
+    id 'xyz.wagyourtail.unimined' version '1.3.14'
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'maven'
-apply plugin: 'scala'
-//apply plugin: 'curseforge'
+apply from: 'gradle/scripts/helpers.gradle'
 
+// Early Assertions
+assertProperty 'mod_version'
+assertProperty 'root_package'
+assertProperty 'mod_name'
 
-group = "mrtjp"
-archivesBaseName = "MrTJPCore"
+assertSubProperties 'use_access_transformer', 'access_transformer_locations'
+assertSubProperties 'is_coremod', 'coremod_includes_mod', 'coremod_plugin_class_name'
+assertSubProperties 'use_asset_mover', 'asset_mover_version'
 
-ext.configFile = file "build.properties"
-configFile.withReader {
-    def prop = new Properties()
-    prop.load(it)
-    //Referred to as 'config' or 'project.config'
-    project.ext.config = new ConfigSlurper().parse prop
+setDefaultProperty 'generate_sources_jar', true, false
+setDefaultProperty 'generate_javadocs_jar', true, false
+setDefaultProperty 'minecraft_username', true, 'Developer'
+setDefaultProperty 'extra_jvm_args', false, ''
+
+version = propertyString('mod_version')
+group = propertyString('root_package')
+
+base {
+    archivesName.set(propertyString('mod_name'))
+}
+
+scala {
+    scalaVersion = '2.12.20'
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+    if (propertyBool('generate_sources_jar')) {
+        withSourcesJar()
+    }
+    if (propertyBool('generate_javadocs_jar')) {
+        withJavadocJar()
+    }
 }
 
 configurations {
-    deployerJars
+    embed
+    contain
+    implementation.extendsFrom(embed)
+}
+
+unimined.minecraft {
+    version "1.12.2"
+
+    mappings {
+        mcp("stable", "39-1.12")
+    }
+
+    cleanroom {
+        if (propertyBool('use_access_transformer')) {
+            accessTransformer 'src/main/resources/META-INF/' +  propertyString('access_transformer_locations')
+        }
+        loader "0.3.0-alpha"
+        runs.auth.username = minecraft_username
+        runs.all {
+            if (hasProperty("extra_jvm_args")) {
+                jvmArgs(propertyString('extra_jvm_args'))
+            }
+            if (propertyBool('enable_foundation_debug')) {
+                systemProperty("foundation.dump", "true")
+                systemProperty("foundation.verbose", "true")
+            }
+            return
+        }
+    }
+
+
 }
 
 repositories {
     maven {
-        name "chickenbones"
-        url "http://chickenbones.net/maven/"
+        name 'CleanroomMC Maven'
+        url 'https://maven.cleanroommc.com'
     }
 }
 
 dependencies {
-    deployerJars "org.apache.maven.wagon:wagon-ftp:2.2"
-    compile "codechicken:CodeChickenLib:${config.mc_version}-${config.ccl_version}:deobf"
-}
-
-def build_number = project.hasProperty("manualbuildnum") ? project.manualbuildnum : (System.getenv("BUILD_NUMBER") ?: "1")
-version = "${project.config.mod_version}." + build_number
-println "Starting build for $archivesBaseName $version for MC $config.mc_version-$config.forge_version"
-
-minecraft {
-    version = config.mc_version + "-" + config.forge_version
-    mappings = config.mappings
-    runDir = "run"
-    makeObfSourceJar = false
-}
-
-sourceSets {
-    main {
-        def root = project.projectDir
-        scala {
-            srcDir new File(root, "src")
-        }
-        resources {
-            srcDir new File(root, "resources")
-        }
+    if (propertyBool('use_asset_mover')) {
+        implementation "com.cleanroommc:assetmover:${propertyString('asset_mover_version')}"
+    }
+    if (propertyBool('enable_junit_testing')) {
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     }
 }
+
+apply from: 'gradle/scripts/dependencies.gradle'
 
 processResources {
-    //redo task if any of these properties change
-    inputs.property "version", project.version
-    inputs.property "mc.version", config.mc_version
 
-    // Replace properties in all files
-    from(sourceSets.main.resources.srcDirs) {
-        include '**.info'
-        expand  'mod_version': version, 'mc_version': config.mc_version,
-                'forge_version': config.forge_version,
-                'ccl_version': config.ccl_version.replace(".+", "")
-        filter(ReplaceTokens, tokens: [
-                'VERSION'      : config.mod_version,
-                'BUILD_NUMBER' : build_number,
-                'MC_VERSION'   : config.mc_version,
-                'FORGE_VERSION': config.forge_version,
-                'CCL_VERSION'  : config.ccl_version
-        ])
+    inputs.property 'mod_version', propertyString('mod_version')
+
+    def filterList = ['mcmod.info']
+
+    filesMatching(filterList) { fcd ->
+        fcd.expand(
+                'mod_version': propertyString('mod_version'),
+        )
     }
-    // Copy everything else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'assets/**/*.*'
-    }
-}
 
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
-}
-
-task srcJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
 }
 
 jar {
-    classifier = 'universal'
-}
-
-// Enable experimental features for scala compiler
-tasks.withType(ScalaCompile) {
-    scalaCompileOptions.additionalParameters = ["-Xexperimental"]
-    scalaCompileOptions.setDeprecation false
-}
-
-artifacts {
-    archives deobfJar
-    archives srcJar
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            if (project.hasProperty("local_maven")) {
-                repository(url: "file://${local_maven}")
-                pom {
-                    groupId = project.group
-                    version = "${project.minecraft.version}-${project.version}"
-                    artifactId = project.archivesBaseName
-                    project {
-                        name project.archivesBaseName
-                        packaging 'jar'
-                        description project.archivesBaseName
-                        url 'https://github.com/MrTJP/' + project.archivesBaseName
-
-                        scm {
-                            url 'https://github.com/MrTJP/' + project.archivesBaseName
-                            connection 'scm:git:git://github.com/MrTJP/' + project.archivesBaseName + '.git'
-                            developerConnection 'scm:git:git@github.com:MrTJP/' + project.archivesBaseName + '.git'
-                        }
-
-                        issueManagement {
-                            system 'github'
-                            url 'https://github.com/MrTJP/' + project.archivesBaseName + '/issues'
-                        }
-
-                        licenses {
-                            license {
-                                name 'GNU Lesser Public License (GPL), Version 2.1'
-                                url 'https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt'
-                                distribution 'repo'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'mrtjp'
-                                name 'mrtjp'
-                                roles { role 'developer' }
-                            }
-                        }
-                    }
+    if (configurations.contain.size() > 0) {
+        into('/') {
+            from configurations.contain
+        }
+    }
+    doFirst{
+        manifest {
+            def attribute_map = [:]
+            attribute_map['ModType'] = "CRL"
+            if (configurations.contain.size() > 0) {
+                attribute_map['ContainedDeps'] = configurations.contain.collect { it.name }.join(' ')
+                attribute_map['NonModDeps'] = true
+            }
+            if (propertyBool('is_coremod')) {
+                attribute_map['FMLCorePlugin'] = propertyString('coremod_plugin_class_name')
+                if (propertyBool('coremod_includes_mod')) {
+                    attribute_map['FMLCorePluginContainsFMLMod'] = true
                 }
             }
+            if (propertyBool('use_access_transformer')) {
+                attribute_map['FMLAT'] = propertyString('access_transformer_locations')
+            }
+            attributes(attribute_map)
         }
     }
 }
 
-/*if (project.hasProperty('curseapi')) {
-    curse {
-        projectId = '229002'
-        apiKey = project.curseapi
-        releaseType = 'release'
-
-        additionalArtifact deobfJar
-        additionalArtifact sourceJar
+tasks.remapJar {
+    archiveClassifier = 'universal'
+    doFirst {
+        logging.captureStandardOutput LogLevel.INFO
     }
-}*/
+    doLast {
+        logging.captureStandardOutput LogLevel.QUIET
+    }
+}
+
+tasks.withType(ScalaCompile).configureEach {
+    scalaCompileOptions.additionalParameters = ['-target:jvm-1.8']
+}
+compileTestJava {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+test {
+    useJUnitPlatform()
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    })
+    if (propertyBool('show_testing_output')) {
+        testLogging {
+            showStandardStreams = true
+        }
+    }
+}
+
+String parserChangelog() {
+    if (!file('CHANGELOG.md').exists()) {
+        throw new GradleException('publish_with_changelog is true, but CHANGELOG.md does not exist in the workspace!')
+    }
+    String parsedChangelog = changelog.renderItem(
+            changelog.get(propertyString('mod_version')).withHeader(false).withEmptySections(false),
+            Changelog.OutputType.MARKDOWN)
+    if (parsedChangelog.isEmpty()) {
+        throw new GradleException('publish_with_changelog is true, but the changelog for the latest version is empty!')
+    }
+    return parsedChangelog
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+
+apply from: 'gradle/scripts/publishing.gradle'
+apply from: 'gradle/scripts/extra.gradle'
