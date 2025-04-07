@@ -8,8 +8,7 @@ package mrtjp.core.util
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.BitSet
 import scala.collection.mutable.{BitSet => MBitSet, Builder => MBuilder}
-import scala.collection.{SortedSetLike, immutable}
-import scala.IterableOnce
+import scala.collection.{IterableOnce, SortedSet, immutable}
 
 trait Enum
 {
@@ -55,7 +54,7 @@ trait Enum
         override def hashCode = 31*(this.getClass.## +name.## +ordinal)
 
         def +(v:EnumVal) = ValSet(getThis, v)
-        def ++(xs:IterableOnceIterableOnce[EnumVal]) = (ValSet.newBuilder ++= xs).result()
+        def ++(xs:IterableOnce[EnumVal]) = (ValSet.newBuilder ++= xs).result()
 
         def until(v:EnumVal) = build(ordinal until v.ordinal)
         def to(v:EnumVal) = build(ordinal to v.ordinal)
@@ -74,7 +73,6 @@ trait Enum
 
     class ValSet(var set:BitSet) extends Set[EnumVal]
     with immutable.SortedSet[EnumVal]
-    with SortedSetLike[EnumVal, ValSet]
     with Serializable
     {
         implicit def ordering = ValOrdering
@@ -84,10 +82,10 @@ trait Enum
             new ValSet(set.rangeImpl(from.map(_.ordinal), until.map(_.ordinal)))
 
         override def contains(elem:EnumVal) = set contains elem.ordinal
-        override def +(elem:EnumVal) = new ValSet(set + elem.ordinal)
-        override def -(elem:EnumVal) = new ValSet(set - elem.ordinal)
+        override def excl(elem:EnumVal) = new ValSet(set + elem.ordinal)
+        override def incl(elem:EnumVal) = new ValSet(set - elem.ordinal)
         override def iterator = set.iterator map (id => thisenum(id))
-        override def keysIteratorFrom(start: EnumVal) =
+        override def iteratorFrom(start: EnumVal) =
             throw new NotImplementedError("Please report this crash")
     }
 
@@ -100,15 +98,19 @@ trait Enum
         def newBuilder = new MBuilder[EnumVal, ValSet]
         {
             private val b = new MBitSet
-            def +=(x:EnumVal) = {b += x.ordinal; this}
+            def addOne(x:EnumVal) = {b += x.ordinal; this}
             def clear() = b.clear()
             def result() = new ValSet(b.toImmutable)
         }
 
         implicit def canBuildFrom = new CanBuildFrom[ValSet, EnumVal, ValSet]
         {
-            def apply(from:ValSet) = newBuilder
-            def apply() = newBuilder
+            def newBuilder(from:ValSet) = newBuilder(from)
+            def fromSpecific(from:ValSet)(it: IterableOnce[EnumVal]) = {
+                val out = empty
+                it.foreach(out.excl)
+                out
+            }
         }
     }
 }

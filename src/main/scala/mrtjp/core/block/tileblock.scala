@@ -33,7 +33,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object MultiTileBlock
 {
@@ -146,7 +146,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
             val b = state.getBlock
             if (b.canHarvestBlock(world, pos, player) && !player.capabilities.isCreativeMode) {
                 val stacks = getDrops(world, pos, state, EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, player.getHeldItemMainhand))
-                for (stack <- stacks) WorldLib.dropItem(world, pos, stack)
+                for (stack <- stacks.asScala) WorldLib.dropItem(world, pos, stack)
             }
             world.setBlockToAir(pos)
             true

@@ -117,7 +117,7 @@ class ItemQueue
         this
     }
 
-    def ++=(xs:IterableOnceIterableOnce[(ItemKey, Int)]) = {xs foreach +=; this}
+    def ++=(xs:IterableOnce[(ItemKey, Int)]) = {xs foreach +=; this}
 
     def ++=(that:ItemQueue) = {that.result.foreach(+=); this}
 
@@ -133,7 +133,7 @@ class ItemQueue
         else collection -= elem._1
     }
 
-    def --=(xs:IterableOnceIterableOnce[(ItemKey, Int)]) = {xs foreach -=; this}
+    def --=(xs:IterableOnce[(ItemKey, Int)]) = {xs foreach -=; this}
 
     def --=(that:ItemQueue) = {that.result.foreach(-=); this}
 

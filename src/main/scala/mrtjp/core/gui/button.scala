@@ -12,7 +12,6 @@ import net.minecraft.client.audio.PositionedSoundRecord
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.SoundEvents
 
-import scala.collection.convert.WrapAsJava
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
 

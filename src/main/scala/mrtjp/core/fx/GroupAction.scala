@@ -46,5 +46,5 @@ class GroupAction extends ParticleAction
         actions.foreach(_.reset())
     }
 
-    override def copy = ParticleAction.group(actions.map(_.copy):_*)
+    override def copy = ParticleAction.group(actions.map(_.copy).toList:_*)
 }
