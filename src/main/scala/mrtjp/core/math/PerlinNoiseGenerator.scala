@@ -10,18 +10,15 @@ import java.util.Random
 import net.minecraft.world.World
 
 object PerlinNoiseGenerator extends PerlinNoiseGenerator
-{
-    protected def floor(x:Double) = if (x >= 0) x.toInt else x.toInt-1
+:
+    protected def floor(x:Double) = if x >= 0 then x.toInt else x.toInt-1
     protected def fade(x:Double) = x*x*x*(x*(x*6-15)+10)
     protected def lerp(x:Double, y:Double, z:Double) = y+x*(z-y)
     protected def grad(hash1:Int, x:Double, y:Double, z:Double) =
-    {
         val hash = hash1&15
-        val u = if (hash < 8) x else y
-        val v = if (hash < 4) y else if (hash == 12 || hash == 14) x else z
-        (if ((hash&1) == 0) u else -u)+(if ((hash&2) == 0) v else -v)
-    }
-}
+        val u = if hash < 8 then x else y
+        val v = if hash < 4 then y else if hash == 12 || hash == 14 then x else z
+        (if (hash&1) == 0 then u else -u)+(if (hash&2) == 0 then v else -v)
 
 class PerlinNoiseGenerator(rand:Random)
 {
@@ -34,19 +31,16 @@ class PerlinNoiseGenerator(rand:Random)
     private val offsetY = rand.nextDouble*256
     private val offsetZ = rand.nextDouble*256
 
-    {
-        for (i <- 0 until 256) perm(i) = rand.nextInt(256)
 
-        for (i <- 0 until 256)
-        {
-            val pos = rand.nextInt(256-i)+i
-            val old = perm(i)
-            perm(i) = perm(pos)
-            perm(pos) = old
-            perm(i+256) = perm(i)
+    for i <- 0 until 256 do perm(i) = rand.nextInt(256)
 
-        }
-    }
+    for i <- 0 until 256 do
+        val pos = rand.nextInt(256-i)+i
+        val old = perm(i)
+        perm(i) = perm(pos)
+        perm(pos) = old
+        perm(i+256) = perm(i)
+
 
     def noise(x:Double):Double = noise(x, 0, 0)
     def noise(x:Double, y:Double):Double = noise(x, y, 0)
@@ -60,7 +54,6 @@ class PerlinNoiseGenerator(rand:Random)
      * @return Noise at given location, from range -1 to 1
      */
     def noise(x:Double, y:Double, z:Double):Double =
-    {
         var x1 = x+offsetX
         var y1 = y+offsetY
         var z1 = z+offsetZ
@@ -98,7 +91,6 @@ class PerlinNoiseGenerator(rand:Random)
             x1, y1-1, z1), grad(perm(BB), x1-1, y1-1, z1))), lerp(fY, lerp(fX, grad(perm(AA+1), x1, y1, z1-1),
             grad(perm(BA+1), x1-1, y1, z1-1)), lerp(fX, grad(perm(AB+1), x1, y1-1, z1-1),
             grad(perm(BB+1), x1-1, y1-1, z1-1))))
-    }
 
 
     /**
@@ -115,21 +107,17 @@ class PerlinNoiseGenerator(rand:Random)
      * @return Resulting noise
      */
     def noise(x:Double, y:Double, z:Double, octaves:Int, frequency:Double, amplitude:Double, normalized:Boolean):Double =
-    {
         var result = 0.0D
         var amp = 1.0D
         var freq = 1.0D
         var max = 0.0D
 
-        for (i <- 0 until octaves)
-        {
+        for i <- 0 until octaves do
             result += noise(x*freq, y*freq, z*freq)*amp
             max += amp
             freq *= frequency
             amp *= amplitude
-        }
 
-        if (normalized) result /= max
+        if normalized then result /= max
         result
-    }
 }

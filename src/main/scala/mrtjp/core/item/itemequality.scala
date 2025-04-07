@@ -8,7 +8,7 @@ package mrtjp.core.item
 import net.minecraftforge.oredict.OreDictionary
 
 class ItemEquality
-{
+:
     var matchMeta = true
     var matchNBT = true
     var matchOre = false
@@ -16,61 +16,44 @@ class ItemEquality
     var damageGroup = -1
 
     def apply(key:ItemKey) =
-    {
         val c = new AppliedItemEquality(key)
         c.setFlags(matchMeta, matchNBT, matchOre, damageGroup)
         c
-    }
 
     def setFlags(meta:Boolean, nbt:Boolean, ore:Boolean, group:Int): Unit =
-    {
         matchMeta = meta
         matchNBT = nbt
         matchOre = ore
         damageGroup = group
-    }
 
     def matches(key1:ItemKey, key2:ItemKey):Boolean =
-    {
-        if (key1.isEmpty || key2.isEmpty) return key1 == key2
+        if key1.isEmpty || key2.isEmpty then return key1 == key2
 
         val stack1 = key1.makeStack(1)
         val stack2 = key2.makeStack(1)
 
-        if (matchOre)
-        {
+        if matchOre then
             val a = OreDictionary.getOreIDs(stack1)
             val b = OreDictionary.getOreIDs(stack2)
-            if (a.exists(b.contains)) return true
-        }
+            if a.exists(b.contains) then return true
 
-        if (key1.item == key2.item)
-        {
-            if (matchNBT && key1.tag != key2.tag) return false
-            if (matchMeta)
-            {
-                if (stack1.isItemStackDamageable && stack2.isItemStackDamageable && damageGroup > -1)
-                {
+        if key1.item == key2.item then
+            if matchNBT && key1.tag != key2.tag then return false
+            if matchMeta then
+                if stack1.isItemStackDamageable && stack2.isItemStackDamageable && damageGroup > -1 then
                     val percentDamage1 = stack1.getItemDamage.toDouble/stack1.getMaxDamage*100
                     val percentDamage2 = stack2.getItemDamage.toDouble/stack2.getMaxDamage*100
                     val isUpperGroup1 = percentDamage1 >= damageGroup
                     val isUpperGroup2 = percentDamage2 >= damageGroup
                     return isUpperGroup1 == isUpperGroup2
-                }
                 else return stack1.getItemDamage == stack2.getItemDamage
-            }
             return true
-        }
         false
-    }
-}
 
 object ItemEquality
-{
+:
     val standard = new ItemEquality
-}
 
 class AppliedItemEquality(val key:ItemKey) extends ItemEquality
-{
+:
     def matches(key2:ItemKey):Boolean = matches(key, key2)
-}

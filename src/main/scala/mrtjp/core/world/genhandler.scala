@@ -25,14 +25,13 @@ import net.minecraftforge.fml.relauncher.Side
 import scala.collection.mutable.{Queue => MQueue}
 
 trait ISimpleStructureGen
-{
+:
     def genID:String
 
     def generate(w:World, chunkX:Int, chunkZ:Int, rand:Random, isRetro:Boolean):Boolean
-}
 
 object SimpleGenHandler extends IWorldGenerator
-{
+:
     private var structures = Seq[ISimpleStructureGen]()
     private var structHash = 0L
 
@@ -42,85 +41,65 @@ object SimpleGenHandler extends IWorldGenerator
     private val tagDB = "RetrogenData_"+MrTJPConfig.retro_gen_id
 
     def init(): Unit =
-    {
         GameRegistry.registerWorldGenerator(this, 0)
         MinecraftForge.EVENT_BUS.register(this)
         MinecraftForge.ORE_GEN_BUS.register(this)
 
-        if (retroGen) MinecraftForge.EVENT_BUS.register(this)
-    }
+        if retroGen then MinecraftForge.EVENT_BUS.register(this)
 
     def registerStructure(struct:ISimpleStructureGen): Unit =
-    {
-        if (structures.exists(_.genID == struct.genID))
+        if structures.exists(_.genID == struct.genID) then
             log.error("MrTJP Structure gen duplicate structure '%s'", struct.genID)
         else
-        {
             structures :+= struct
             structHash += struct.genID.hashCode
-        }
-    }
 
     @SubscribeEvent
     def chunkSaveEvent(event:ChunkDataEvent.Save): Unit =
-    {
         val genNBT = event.getData.getCompoundTag(tagDB)
 
         val structList = new NBTTagList
-        for (g <- structures) structList.appendTag(new NBTTagString(g.genID))
+        for g <- structures do structList.appendTag(new NBTTagString(g.genID))
 
         genNBT.setTag("StructList", structList)
         genNBT.setLong("StructHash", structHash)
         event.getData.setTag(tagDB, genNBT)
-    }
 
     @SubscribeEvent
     def chunkLoadEvent(event:ChunkDataEvent.Load): Unit =
-    {
-        if (retroGen)
-        {
+        if retroGen then
             val dim = event.getWorld.provider.getDimension
             val tag = event.getData.getTag(tagDB).asInstanceOf[NBTTagCompound]
-            val list = if (tag == null) new NBTTagList else tag.getTagList("StructList", Constants.NBT.TAG_STRING)
+            val list = if tag == null then new NBTTagList else tag.getTagList("StructList", Constants.NBT.TAG_STRING)
 
-            if (tag == null || tag.getLong("StructHash") != structHash || list.tagCount != structures.size)
-            {
+            if tag == null || tag.getLong("StructHash") != structHash || list.tagCount != structures.size then
                 val chunk = ChunkCoord(event.getChunk.x, event.getChunk.z, list)
                 val chunks = genQueue.getOrElse(dim, MQueue[ChunkCoord]())
                 chunks.enqueue(chunk)
                 genQueue += dim -> chunks
-            }
-        }
-    }
 
     override def generate(rand:Random, chunkX:Int, chunkZ:Int, world:World, g:IChunkGenerator, p:IChunkProvider): Unit =
-    {
         subGenerate(world, chunkX, chunkZ, rand, false)
-    }
 
     private def subGenerate(w:World, chunkX:Int, chunkZ:Int, rand:Random, isRetro:Boolean, existingStructs:Set[String] = Set.empty): Unit =
-    {
         var gen = false
-        for (s <- structures) if (!existingStructs.contains(s.genID))
+        for s <- structures do if !existingStructs.contains(s.genID) then
             gen |= s.generate(w, chunkX, chunkZ, rand, isRetro)
 
-        if (isRetro && gen) w.getChunk(chunkX, chunkZ).setModified(true)
-    }
+        if isRetro && gen then w.getChunk(chunkX, chunkZ).setModified(true)
 
     @SubscribeEvent
     def tickEnd(event:WorldTickEvent): Unit =
-    {
-        if (event.side != Side.SERVER || event.phase != Phase.END) return
+        if event.side != Side.SERVER || event.phase != Phase.END then return
 
         val world = event.world
         val dim = world.provider.getDimension
 
-        if (world.getWorldTime%10 != 0) return //Don't gen too quickly
-        if (!genQueue.contains(dim)) return
+        if world.getWorldTime%10 != 0 then return //Don't gen too quickly
+        if !genQueue.contains(dim) then return
 
         val chunks = genQueue(dim)
-        if (chunks.nonEmpty)
-        {
+        if chunks.nonEmpty then
             val chunk = chunks.dequeue()
 
             val worldSeed = world.getSeed
@@ -131,22 +110,16 @@ object SimpleGenHandler extends IWorldGenerator
 
             log.warn("Starting Retrogeneration on chunk @[DIM "+dim+"]"+chunk.toString)
             subGenerate(world, chunk.chunkX, chunk.chunkZ, rand, true, chunk.structList)
-        }
 
-        if (chunks.isEmpty) genQueue -= dim
-    }
+        if chunks.isEmpty then genQueue -= dim
 
     private case class ChunkCoord(chunkX:Int, chunkZ:Int, tag:NBTTagList)
-    {
+    :
         val structList =
-        {
             val builder = Set.newBuilder[String]
-            if (tag != null) for (i <- 0 until tag.tagCount())
+            if tag != null then for i <- 0 until tag.tagCount() do
                 builder += tag.getStringTagAt(i)
             builder.result()
-        }
 
         override def toString = "["+chunkX+", "+chunkZ+"]"
-    }
-}
 

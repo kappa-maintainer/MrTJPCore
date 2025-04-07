@@ -6,12 +6,10 @@
 package mrtjp.core.vec
 
 case class Size(width:Int, height:Int)
-{
+:
     override def equals(obj:scala.Any) = obj match
-    {
         case that:Size => that.width == width && that.height == height
         case _ => false
-    }
 
     def negate = Size(-width, -height)
     def invert = Size(height, width)
@@ -47,7 +45,6 @@ case class Size(width:Int, height:Int)
     def vectorize = Vec2(width, height)
 
     override def toString = s"Size @[$width $height]"
-}
 
 object Size
 {

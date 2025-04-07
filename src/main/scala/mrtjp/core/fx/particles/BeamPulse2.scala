@@ -17,7 +17,7 @@ import net.minecraft.world.World
 import org.lwjgl.opengl.GL11
 
 class BeamPulse2(w:World) extends CoreParticle(w) with TAlphaParticle with TColourParticle with TPositionedParticle with TTargetParticle with TTextureParticle
-{
+:
     texture = "projectred:textures/particles/beam1.png"
     setSize(0.02F, 0.02F)
 
@@ -37,7 +37,6 @@ class BeamPulse2(w:World) extends CoreParticle(w) with TAlphaParticle with TColo
 
     private var s:ParticleAction = null
     def doPulse(r:Double, g:Double, b:Double): Unit =
-    {
         import ParticleAction._
         removeAction(s)
         s = sequence(
@@ -45,10 +44,8 @@ class BeamPulse2(w:World) extends CoreParticle(w) with TAlphaParticle with TColo
             changeRGBATo(0.5, 0.5, 0.5, 0.3, 32)
         )
         runAction(s)
-    }
 
     override def renderParticle(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float): Unit =
-    {
         super.renderParticle(buffer, entity, frame, cosyaw, cospitch, sinyaw, sinsinpitch, cossinpitch)
 
         TextureUtils.changeTexture(texture)
@@ -92,8 +89,7 @@ class BeamPulse2(w:World) extends CoreParticle(w) with TAlphaParticle with TColo
         val var44 = -0.15D*size
         val var17 = 0.15D*size
 
-        for (t <- 0 until 2)
-        {
+        for t <- 0 until 2 do
             val var29 = length*var9
             val var31 = 0.0D
             val var33 = 1.0D
@@ -113,7 +109,6 @@ class BeamPulse2(w:World) extends CoreParticle(w) with TAlphaParticle with TColo
             buffer.pos(var17, var29, 0.0D).tex(var31, var37).color(r, g, b, a).endVertex()
 
             rs.draw()
-        }
 
         depthMask(true)
         alphaFunc(516, 0.1F)
@@ -124,10 +119,8 @@ class BeamPulse2(w:World) extends CoreParticle(w) with TAlphaParticle with TColo
         popMatrix()
 
         renderFlare(buffer, entity, frame, cosyaw, cospitch, sinyaw, sinsinpitch, cossinpitch)
-    }
 
     def renderFlare(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float): Unit =
-    {
         TextureUtils.changeTexture(flareTexture)
 
         val part = particleAge%16
@@ -169,7 +162,5 @@ class BeamPulse2(w:World) extends CoreParticle(w) with TAlphaParticle with TColo
         disableBlend()
         enableLighting()
         popMatrix()
-    }
 
     override def getFXLayer = 3
-}

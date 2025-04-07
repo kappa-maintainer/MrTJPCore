@@ -6,12 +6,10 @@
 package mrtjp.core.vec
 
 case class Vec2(dx:Double, dy:Double)
-{
+:
     override def equals(obj:scala.Any) = obj match
-    {
         case that:Vec2 => dx == that.dx && dy == that.dy
         case _ => false
-    }
 
     def copy = Vec2(dx, dy)
 
@@ -36,14 +34,14 @@ case class Vec2(dx:Double, dy:Double)
     def magSquared = dx*dx+dy*dy
     def mag = math.sqrt(magSquared)
 
-    def normalize = if (mag == 0) Vec2.zeroVec else this/mag
+    def normalize = if mag == 0 then Vec2.zeroVec else this/mag
     def negate = Vec2(-dx, -dy)
     def invert = Vec2(dy, dx)
 
-    def project(that:Vec2):Vec2 = that*((this dot that)/that.magSquared)
+    def project(that:Vec2):Vec2 = that*((this `dot` that)/that.magSquared)
     def reject(that:Vec2):Vec2 = this-project(that)
     def axialProject:Vec2 =
-        if (dx.abs > dy.abs) Vec2(dx, 0) else Vec2(0, dy)
+        if dx.abs > dy.abs then Vec2(dx, 0) else Vec2(0, dy)
 
     def unary_- = negate
     def unary_~ = invert
@@ -59,7 +57,6 @@ case class Vec2(dx:Double, dy:Double)
     def /(that:Double) = divide(that)
 
     override def toString = s"Vec2 @[$dx $dy]"
-}
 
 object Vec2
 {

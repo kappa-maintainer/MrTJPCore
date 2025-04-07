@@ -20,17 +20,14 @@ import net.minecraft.world.World
 import net.minecraftforge.fml.common.registry.GameRegistry
 
 class BlockCore(mat:Material) extends Block(mat)
-{
-    def getItemBlockClass:Class[_ <: ItemBlock] = classOf[ItemBlockCore]
+:
+    def getItemBlockClass:Class[? <: ItemBlock] = classOf[ItemBlockCore]
 
     def bindTile[A <: TileEntity](c:Class[A]): Unit =
-    {
         GameRegistry.registerTileEntity(c, getRegistryName.toString)
-    }
-}
 
 class ItemBlockCore(b:Block) extends ItemBlock(b)
-{
+:
     setHasSubtypes(true)
     setMaxDamage(0)
 
@@ -39,31 +36,25 @@ class ItemBlockCore(b:Block) extends ItemBlock(b)
     override def getTranslationKey(stack:ItemStack) = super.getTranslationKey+"|"+stack.getItemDamage
 
     override def placeBlockAt(stack:ItemStack, player:EntityPlayer, w:World, pos:BlockPos, side:EnumFacing, hitX:Float, hitY:Float, hitZ:Float, newState:IBlockState) =
-    {
         val a = super.placeBlockAt(stack, player, w, pos, side, hitX, hitY, hitZ, newState)
-        block match {
+        block match
             case b:MultiTileBlock =>
                 b.postBlockSetup(w, pos, side.ordinal, player, stack, new Vector3(hitX, hitY, hitZ))
             case _ =>
-        }
         a
-    }
-}
 
 abstract class BlockDefinition extends ItemDefinition
-{
+:
     override type EnumVal <: BlockDef
 
     override def getItem = Item.getItemFromBlock(getBlock)
     def getBlock:Block
 
     class BlockDef(variantName:String) extends ItemDef(variantName)
-}
 
-trait TSimplePropertyString extends Block {
+trait TSimplePropertyString extends Block:
     def getTypeProperty:PropertyString
 
     override def getMetaFromState(state: IBlockState): Int = getTypeProperty.values.indexOf(state.getValue(getTypeProperty))
 
     override def getStateFromMeta(meta: Int): IBlockState = getBlockState.getBaseState.withProperty(getTypeProperty, getTypeProperty.values.get(meta))
-}

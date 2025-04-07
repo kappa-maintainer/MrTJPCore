@@ -15,20 +15,14 @@ class InventorySlotNode extends TNode
     override def frame = Rect(position, size)
 
     override def frameUpdate_Impl(mouse:Point, rframe:Float): Unit =
-    {
         val root = getRoot
         val slot = root.inventorySlots.asInstanceOf[NodeContainer].slots(slotIdx)
 
-        if (hidden || buildParentHierarchy(root).exists(_.hidden))
-        {
+        if hidden || buildParentHierarchy(root).exists(_.hidden) then
             slot.xPos = 9999
             slot.yPos = 9999
-        }
         else
-        {
             val absPos = parent.convertPointTo(position, root)
             slot.xPos = absPos.x
             slot.yPos = absPos.y
-        }
-    }
 }

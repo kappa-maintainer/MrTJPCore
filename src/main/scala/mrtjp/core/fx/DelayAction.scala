@@ -12,10 +12,8 @@ class DelayAction extends ParticleAction
     var delay = -1.0
 
     override def operate(p:CoreParticle, time:Double): Unit =
-    {
-        if (time > delay)
+        if time > delay then
             isFinished = true
-    }
 
     override def compile(p:CoreParticle): Unit ={}
 

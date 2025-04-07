@@ -62,7 +62,7 @@ import org.lwjgl.input.Mouse
   * @param h The height of this GUI window.
   */
 class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
-{
+:
     /**
       * @constructor Used for creating a default sized GUI window
       * @param c The inventory container object that this GUI is representing. Typically a subclass of @class NodeContainer.
@@ -89,73 +89,51 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
     override def frame = new Rect(position, size)
 
     final override def initGui(): Unit =
-    {
         super.initGui()
         position = Point(guiLeft, guiTop)
-        if (size == Size.zeroSize) size = Size(xSize, ySize) //TODO Legacy (size should be set directly)
+        if size == Size.zeroSize then size = Size(xSize, ySize) //TODO Legacy (size should be set directly)
         else
-        {
             xSize = size.width
             ySize = size.height
-        }
-    }
 
     final override def updateScreen(): Unit =
-    {
         super.updateScreen()
         update()
-    }
 
     final override def drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float): Unit =
-    {
         drawDefaultBackground()
         super.drawScreen(mouseX, mouseY, partialTicks)
         renderHoveredToolTip(mouseX, mouseY)
-    }
 
     final override def setWorldAndResolution(mc:Minecraft, i:Int, j:Int): Unit =
-    {
         val init = this.mc == null
         super.setWorldAndResolution(mc, i, j)
-        if (init) onAddedToParent_Impl()
-    }
+        if init then onAddedToParent_Impl()
 
     final override def mouseClicked(x:Int, y:Int, button:Int): Unit =
-    {
         super.mouseClicked(x, y, button)
         mouseClicked(new Point(x, y), button, false)
-    }
 
 
     final override def mouseReleased(x:Int, y:Int, button:Int): Unit =
-    {
         super.mouseReleased(x, y, button)
-        if (button != -1) mouseReleased(new Point(x, y), button, false)
-    }
+        if button != -1 then mouseReleased(new Point(x, y), button, false)
 
     final override def mouseClickMove(x:Int, y:Int, button:Int, time:Long): Unit =
-    {
         super.mouseClickMove(x, y, button, time)
         mouseDragged(new Point(x, y), button, time, false)
-    }
 
     final override def handleMouseInput(): Unit =
-    {
         super.handleMouseInput()
         val i = Mouse.getEventDWheel
-        if (i != 0)
-        {
+        if i != 0 then
             val p = GuiDraw.getMousePosition
-            mouseScrolled(new Point(p.x, p.y), if (i > 0) 1 else -1, false)
-        }
-    }
+            mouseScrolled(new Point(p.x, p.y), if i > 0 then 1 else -1, false)
 
     final override def keyTyped(c:Char, keycode:Int): Unit =
-    {
-        if (keyPressed(c, keycode, false)) return
+        if keyPressed(c, keycode, false) then return
 
         super.keyTyped(c, keycode)
-    }
 
     /**
       * Used to check if the `keycode` should close the GUI.
@@ -170,7 +148,6 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
 
     // Front/back rendering overridden, because at root, we dont push the children to our pos, because its zero.
     final override def drawGuiContainerBackgroundLayer(f:Float, mx:Int, my:Int): Unit =
-    {
         lastFrame = f
         val mouse = new Point(mx, my)
         frameUpdate(mouse, f)
@@ -179,10 +156,8 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
         rootDrawBack(mouse, f)
         color(1, 1, 1, 1)
         enableDepth()
-    }
 
     final override def drawGuiContainerForegroundLayer(mx:Int, my:Int): Unit =
-    {
         val mouse = new Point(mx, my)
         disableDepth()
         color(1, 1, 1, 1)
@@ -190,24 +165,16 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
         color(1, 1, 1, 1)
         enableDepth()
 
-        if (debugDrawFrames)
-        {
+        if debugDrawFrames then
             translate(-position.x, -position.y, 0)
             def render(node:TNode): Unit =
-            {
-                if (!node.hidden)
-                {
+                if !node.hidden then
                     val f = node.frame
                     val absF = Rect(node.parent.convertPointToScreen(f.origin), f.size)
                     GuiDraw.drawLine(absF.x, absF.y, absF.x, absF.maxY, 3, EnumColour.RED.rgba())
                     GuiDraw.drawLine(absF.x, absF.maxY, absF.maxX, absF.maxY, 3, EnumColour.RED.rgba())
                     GuiDraw.drawLine(absF.maxX, absF.maxY, absF.maxX, absF.y, 3, EnumColour.RED.rgba())
                     GuiDraw.drawLine(absF.maxX, absF.y, absF.x, absF.y, 3, EnumColour.RED.rgba())
-                }
-                for (c <- node.children) render(c)
-            }
-            for (c <- children) render(c)
+                for c <- node.children do render(c)
+            for c <- children do render(c)
             translate(position.x, position.y, 0)
-        }
-    }
-}

@@ -8,7 +8,7 @@ package mrtjp.core.fx
 import mrtjp.core.fx.particles.CoreParticle
 
 class RepeatAction extends ParticleAction
-{
+:
     var repeatTimes = -1
     var action:ParticleAction = null
 
@@ -18,79 +18,58 @@ class RepeatAction extends ParticleAction
         super.canOperate(p) && action.canOperate(p)
 
     override def tickLife(): Unit =
-    {
         super.tickLife()
         action.tickLife()
-    }
 
     override def runOn(p:CoreParticle, frame:Float): Unit =
-    {
         super.runOn(p, frame)
 
-        if (iter < repeatTimes)
-        {
+        if iter < repeatTimes then
             action.runOn(p, frame)
-            if (action.isFinished)
-            {
+            if action.isFinished then
                 iter += 1
                 action.reset()
-            }
-        }
 
-        if (iter >= repeatTimes)
+        if iter >= repeatTimes then
             isFinished = true
-    }
 
     override def operate(p:CoreParticle, time:Double): Unit ={}
 
     override def compile(p:CoreParticle): Unit =
-    {
         super.compile(p)
         action.compile(p)
-    }
 
     override def reset(): Unit =
-    {
         super.reset()
         iter = 0
         action.reset()
-    }
 
     override def copy = ParticleAction.repeat(action.copy, repeatTimes)
-}
 
 class RepeatForeverAction extends ParticleAction
 {
     var action:ParticleAction = null
 
     override def tickLife(): Unit =
-    {
         super.tickLife()
         action.tickLife()
-    }
 
     override def runOn(p:CoreParticle, frame:Float): Unit =
-    {
         super.runOn(p, frame)
 
         action.runOn(p, frame)
-        if (action.isFinished)
+        if action.isFinished then
             action.reset()
-    }
 
     override def operate(p:CoreParticle, time:Double): Unit ={}
 
     override def compile(p:CoreParticle): Unit =
-    {
         super.compile(p)
         action.compile(p)
-    }
 
     override def reset(): Unit =
-    {
         super.reset()
         action.reset()
-    }
 
     override def copy = ParticleAction.repeatForever(action.copy)
 }

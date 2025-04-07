@@ -17,7 +17,7 @@ import net.minecraft.world.World
 import org.lwjgl.opengl.GL11
 
 class SpriteParticle(w:World) extends CoreParticle(w) with TColourParticle with TAlphaParticle with TPositionedParticle with TTextureParticle with TScalableParticle
-{
+:
     override def x = posX
     override def y = posY
     override def z = posZ
@@ -31,7 +31,6 @@ class SpriteParticle(w:World) extends CoreParticle(w) with TColourParticle with 
     override def pz_=(z:Double): Unit ={prevPosZ = z}
 
     override def renderParticle(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float): Unit =
-    {
         super.renderParticle(buffer, entity, frame, cosyaw, cospitch, sinyaw, sinsinpitch, cossinpitch)
 
         TextureUtils.changeTexture(texture)
@@ -70,7 +69,5 @@ class SpriteParticle(w:World) extends CoreParticle(w) with TColourParticle with 
         alphaFunc(516, 0.1F)
         disableBlend()
         enableLighting()
-    }
 
     override def getFXLayer = 3
-}

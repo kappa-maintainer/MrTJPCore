@@ -19,76 +19,59 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.{Phase, WorldTickEvent}
 import net.minecraftforge.fml.relauncher.Side
 
 object BlockUpdateHandler
-{
+:
     private var updateLCG = new Random().nextInt
     private var handlers = Array.empty[IBlockEventHandler]
     private var registered = false
     private var chunkSet = new JHSet[ChunkPos]()
 
     def register(handler:IBlockEventHandler): Unit =
-    {
-        if (!registered)
-        {
+        if !registered then
             MinecraftForge.EVENT_BUS.register(this)
             registered = true
-        }
 
         handlers :+= handler
-    }
 
     def getActiveChunkSet(w:World):JSet[ChunkPos] =
-    {
         chunkSet.clear()
         chunkSet.addAll(w.getPersistentChunks.keySet)
 
         var i = 0
-        while (i < w.playerEntities.size)
-        {
+        while i < w.playerEntities.size do
             val entityplayer = w.playerEntities.get(i).asInstanceOf[EntityPlayer]
             val j = MathHelper.floor(entityplayer.posX/16.0D)
             val k = MathHelper.floor(entityplayer.posZ/16.0D)
             val l = ServerUtils.mc().getPlayerList.getViewDistance
 
             var i1 = -l
-            while (i1 <= l)
-            {
+            while i1 <= l do
                 var j1 = -l
-                while (j1 <= l)
-                {
+                while j1 <= l do
                     chunkSet.add(new ChunkPos(i1+j, j1+k))
                     j1 += 1
-                }
                 i1 += 1
-            }
             i += 1
-        }
         chunkSet
-    }
 
     @SubscribeEvent
     def onTick(event:WorldTickEvent): Unit =
-    {
-        if (event.side != Side.SERVER || event.phase != Phase.END) return
+        if event.side != Side.SERVER || event.phase != Phase.END then return
 
         //Reproduces same algorithm used for random block updates
         val world = event.world.asInstanceOf[WorldServer]
 
         val cIt = getActiveChunkSet(world).iterator()
-        while (cIt.hasNext)
-        {
+        while cIt.hasNext do
             val chunkPos = cIt.next()
             val chunk = world.getChunk(chunkPos.x, chunkPos.z)
             val ebstorage = chunk.getBlockStorageArray
 
             var k = 0
-            while (k < ebstorage.length)
-            {
+            while k < ebstorage.length do
                 val ebs = ebstorage(k)
-                if (ebs != null)
-                {
+                if ebs != null then
                     var i = 0
-                    while (i < 3)
-                    {
+                    while i < 3 do
                         updateLCG = updateLCG*3+1013904223
                         val i2 = updateLCG>>2
                         val j2 = i2&15
@@ -97,22 +80,13 @@ object BlockUpdateHandler
                         val block = ebs.get(j2, l2, k2)
 
                         var j = 0
-                        while(j < handlers.length)
-                        {
+                        while j < handlers.length do
                             val p = new BlockPos(j2+chunk.x*16, l2+ebs.getYLocation, k2+chunk.z*16)
                             handlers(j).onBlockUpdate(world, p, block)
                             j += 1
-                        }
                         i += 1
-                    }
-                }
                 k += 1
-            }
-        }
-    }
-}
 
 trait IBlockEventHandler
-{
+:
     def onBlockUpdate(w:World, p:BlockPos, b:IBlockState): Unit 
-}

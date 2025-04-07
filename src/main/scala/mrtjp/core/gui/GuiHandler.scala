@@ -75,7 +75,7 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
   *
   */
 object GuiHandler
-{
+:
     private var guiMap = Map[Int, TGuiFactory]()
 
     /**
@@ -87,21 +87,17 @@ object GuiHandler
       * @param dataWrite Partial function that adds data to a packet
       */
     private[gui] def openSMPContainer(player1:EntityPlayer, cont:Container, guiID:Int, dataWrite:MCDataOutput => Unit): Unit =
-    {
-        if (!player1.isInstanceOf[EntityPlayerMP]) return
+        if !player1.isInstanceOf[EntityPlayerMP] then return
         val player = player1.asInstanceOf[EntityPlayerMP]
         player.getNextWindowId()
         player.closeContainer()
         val packet = new PacketCustom(MrTJPCoreSPH.channel, MrTJPCoreSPH.guiPacket)
         dataWrite(packet.writeByte(player.currentWindowId).writeShort(guiID))
         packet.sendToPlayer(player)
-        if (cont != null)
-        {
+        if cont != null then
             player.openContainer = cont
             player.openContainer.windowId = player.currentWindowId
             player.openContainer.addListener(player)
-        }
-    }
 
     /**
       * Called client side upon receiving a request to open a gui. Server requests client
@@ -112,11 +108,9 @@ object GuiHandler
       */
     @SideOnly(Side.CLIENT)
     private[gui] def openSMPContainer(windowID:Int, gui:GuiScreen): Unit =
-    {
         val mc = Minecraft.getMinecraft
         mc.displayGuiScreen(gui)
-        if (windowID != 0) mc.player.openContainer.windowId = windowID
-    }
+        if windowID != 0 then mc.player.openContainer.windowId = windowID
 
     /**
       * Internally called by the client when it receives a gui request from the
@@ -127,22 +121,17 @@ object GuiHandler
       */
     @SideOnly(Side.CLIENT)
     private[core] def receiveGuiPacket(data:MCDataInput): Unit =
-    {
         val win = data.readUByte()
         val id = data.readUShort()
         val gui = guiMap.get(id) match
-        {
             case Some(e) => e.buildGui(Minecraft.getMinecraft.player, data)
             case None => null
-        }
-        if (gui != null) openSMPContainer(win, gui)
-    }
+        if gui != null then openSMPContainer(win, gui)
 
     @deprecated("register(factory:TGuiFactory)")
-    def register(factory:TGuiFactory, id:Int): Unit = {
+    def register(factory:TGuiFactory, id:Int): Unit =
         assert(factory.getID == id)
         register(factory)
-    }
 
     /**
       * Called to register a [[TGuiFactory GUI factory]] to the handler. The factory must be registered on both
@@ -151,13 +140,11 @@ object GuiHandler
       * @param factory The factory to register
       * @throws RuntimeException If a factory with the same [[TGuiFactory.getID ID]] is already registered.
       */
-    def register(factory:TGuiFactory): Unit = {
+    def register(factory:TGuiFactory): Unit =
 
-        if (guiMap.contains(factory.getID))
+        if guiMap.contains(factory.getID) then
             throw new RuntimeException(s"There is a factory already registered with ID ${factory.getID}.")
         guiMap += factory.getID -> factory
-    }
-}
 
 /**
   * The base trait for a GUI factory. Each GUI will have its own factory. Factories are responsible for sending
@@ -205,7 +192,5 @@ trait TGuiFactory
       *                  [[buildGui() GUI build function]].
       */
     final def open(player:EntityPlayer, cont:Container, dataWrite:MCDataOutput => Unit): Unit =
-    {
         GuiHandler.openSMPContainer(player, cont, getID, dataWrite)
-    }
 }

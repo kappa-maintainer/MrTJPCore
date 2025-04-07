@@ -18,25 +18,20 @@ import net.minecraft.world.World
 import org.lwjgl.opengl.GL11
 
 class BeamMulti(w:World) extends CoreParticle(w) with TAlphaParticle with TColourParticle with TTextureParticle
-{
+:
     texture = "projectred:textures/particles/beam1.png"
     setSize(0.02F, 0.02F)
 
     var points = Seq.empty[Vector3]
 
     override def renderParticle(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float): Unit =
-    {
         super.renderParticle(buffer, entity, frame, cosyaw, cospitch, sinyaw, sinsinpitch, cossinpitch)
-        if (points.size > 1)
-        {
+        if points.size > 1 then
             TextureUtils.changeTexture(texture)
-            for (i <- 1 until points.size)
+            for i <- 1 until points.size do
                 drawBeam(buffer, points(i-1), points(i), frame)
-        }
-    }
 
     def drawBeam(buffer:BufferBuilder, p1:Vector3, p2:Vector3, f:Float): Unit =
-    {
         val var9 = 1.0F
         val slide = getAge
         val size = 0.7F
@@ -78,8 +73,7 @@ class BeamMulti(w:World) extends CoreParticle(w) with TAlphaParticle with TColou
         val var44 = -0.15D*size
         val var17 = 0.15D*size
 
-        for (t <- 0 until 2)
-        {
+        for t <- 0 until 2 do
             val var29 = length*var9
             val var31 = 0.0D
             val var33 = 1.0D
@@ -99,7 +93,6 @@ class BeamMulti(w:World) extends CoreParticle(w) with TAlphaParticle with TColou
             buffer.pos(var17, var29, 0.0D).tex(var31, var37).color(r, g, b, a).endVertex()
 
             rs.draw()
-        }
 
         depthMask(true)
         alphaFunc(516, 0.1F)
@@ -108,7 +101,5 @@ class BeamMulti(w:World) extends CoreParticle(w) with TAlphaParticle with TColou
         enableLighting()
         enableCull()
         popMatrix()
-    }
 
     override def getFXLayer = 3
-}

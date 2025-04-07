@@ -36,17 +36,14 @@ class SideSelectNode(x:Int, y:Int, w:Int, h:Int) extends TNode
 
     private val buttons = new Array[ButtonNode](6)
 
-    {
         addChild(buildButton(0, 0, "u", 1))
         addChild(buildButton((w/5)*2, 0, "n", 2))
         addChild(buildButton(0, (h/5)*2, "w", 4))
         addChild(buildButton((w/5)*4, (h/5)*1*2, "e", 5))
         addChild(buildButton((w/5)*2, (h/5)*2*2, "s", 3))
         addChild(buildButton((w/5)*4, (h/5)*2*2, "d", 0))
-    }
 
     private def buildButton(x:Int, y:Int, text:String, side:Int) =
-    {
         val b = new MCButtonNode
         b.position = Point(x, y)
         b.size = size/3
@@ -54,22 +51,19 @@ class SideSelectNode(x:Int, y:Int, w:Int, h:Int) extends TNode
         b.clickDelegate = {() => onSidePresed(side)}
         buttons(side) = b
         b
-    }
 
     /**
       * Called by child button nodes when they are pressed.
       * @param side The EnumFacing index of the side that the pressed button represents.
       */
     def onSidePresed(side:Int): Unit =
-    {
         val old = sides
         sides ^= 1<<side
-        if (exclusiveSides) sides &= 1<<side
-        if (old != sides) onSideChanged(side)
+        if exclusiveSides then sides &= 1<<side
+        if old != sides then onSideChanged(side)
 
-        for (s <- 0 until 6)
+        for s <- 0 until 6 do
             buttons(s).mouseoverLock = (sides&1<<s) != 0
-    }
 
     /**
       * Called when the side mask changes.

@@ -119,6 +119,7 @@ processResources {
 }
 
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     if (configurations.contain.size() > 0) {
         into('/') {
             from configurations.contain
@@ -157,7 +158,11 @@ tasks.remapJar {
 }
 
 tasks.withType(ScalaCompile).configureEach {
-    scalaCompileOptions.additionalParameters = ['-source:3.0-migration', '-rewrite']
+    //scalaCompileOptions.additionalParameters = ['-new-syntax', '-rewrite']
+    //scalaCompileOptions.additionalParameters = ['-indent', '-rewrite']
+    //scalaCompileOptions.additionalParameters = ['-source','3.4-migration', '-rewrite']
+    //scalaCompileOptions.additionalParameters = ['-source','3.5-migration', '-rewrite']
+    scalaCompileOptions.additionalParameters = ['-source','3.6-migration', '-rewrite']
 }
 
 

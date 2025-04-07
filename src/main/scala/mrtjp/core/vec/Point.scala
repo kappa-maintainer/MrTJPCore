@@ -6,12 +6,10 @@
 package mrtjp.core.vec
 
 case class Point(x:Int, y:Int)
-{
+:
     override def equals(obj:scala.Any) = obj match
-    {
         case that:Point => x == that.x && y == that.y
         case _ => false
-    }
 
     def copy = Point(x, y)
 
@@ -37,8 +35,8 @@ case class Point(x:Int, y:Int)
     def max(that:Point) = Point(x max that.x, y max that.y)
     def min(that:Point) = Point(x min that.x, y min that.y)
 
-    def clamp(rect:Rect) = this min rect.maxPoint max rect.origin
-    def clamp(size:Size) = this min Point(size) max Point.zeroPoint
+    def clamp(rect:Rect) = this `min` rect.maxPoint `max` rect.origin
+    def clamp(size:Size) = this `min` Point(size) `max` Point.zeroPoint
 
     def offset(r:Int):Point = offset(r, 1)
     def offset(r:Int, amount:Int):Point = this+(Point.dirOffsets(r)*amount)
@@ -57,7 +55,6 @@ case class Point(x:Int, y:Int)
     def /(that:Int) = divide(that)
 
     override def toString = s"Point @[$x $y]"
-}
 
 object Point
 {

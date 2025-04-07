@@ -8,9 +8,8 @@ package mrtjp.core.fx
 import mrtjp.core.fx.particles.CoreParticle
 
 trait TTextureParticle extends CoreParticle
-{
+:
     var texture = ""
-}
 
 class TextureChangeAction extends ParticleAction
 {
@@ -19,10 +18,8 @@ class TextureChangeAction extends ParticleAction
     override def canOperate(p:CoreParticle) = p.isInstanceOf[TTextureParticle]
 
     override def operate(p:CoreParticle, time:Double): Unit =
-    {
         p.asInstanceOf[TTextureParticle].texture = tex
         isFinished = true
-    }
 
     override def compile(p:CoreParticle): Unit ={}
 

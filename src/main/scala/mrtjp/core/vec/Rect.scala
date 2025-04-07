@@ -6,16 +6,14 @@
 package mrtjp.core.vec
 
 case class Rect(origin:Point, size:Size)
-{
+:
     def this(x:Int, y:Int, width:Int, height:Int) = this(Point(x, y), Size(width, height))
     def this(min:Point, max:Point) = this(min, Size(max.x-min.x, max.y-min.y))
     def this(r:Rect) = this(r.origin, r.size)
 
     override def equals(obj:scala.Any) = obj match
-    {
         case that:Rect => origin == that.origin && size == that.size
         case _ => false
-    }
 
     def copy = new Rect(origin, size)
 
@@ -38,7 +36,6 @@ case class Rect(origin:Point, size:Size)
 
     def enclose(p:Point) = new Rect(Point(math.min(x, p.x), math.min(y, p.y)), Point(math.max(maxX, p.x), math.max(maxY, p.y)))
     def union(r:Rect) = new Rect(Point(math.min(x, r.x), math.min(y, r.y)), Point(math.max(maxX, r.maxX), math.max(maxY, r.maxY)))
-}
 
 object Rect
 {

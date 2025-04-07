@@ -13,27 +13,22 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
 class WorldGenClusterizer extends TWorldGenerator
-{
+:
     var cluster = Set[((Block, Int), Int)]()
     var material = Set[(Block, Int)]()
     var clusterSize = 1
 
     override def generate(w:World, rand:Random, pos:BlockPos) =
-        if (clusterSize < 4) generateSmall(w, rand, pos) else generateNormal(w, rand, pos)
+        if clusterSize < 4 then generateSmall(w, rand, pos) else generateNormal(w, rand, pos)
 
     def generateSmall(w:World, rand:Random, pos:BlockPos):Boolean =
-    {
         var generated = false
-        for (i <- 0 until clusterSize)
-        {
+        for i <- 0 until clusterSize do
             val p = pos.add(rand.nextInt(2),rand.nextInt(2),rand.nextInt(2))
             generated |= setBlock(w, p, cluster, material)
-        }
         generated
-    }
 
     def generateNormal(w:World, rand:Random, pos:BlockPos):Boolean =
-    {
         val f = rand.nextFloat*Math.PI.toFloat
         val xNDir = pos.getX+8+(MathHelper.sin(f)*clusterSize)/8F
         val xPDir = pos.getX+8-(MathHelper.sin(f)*clusterSize)/8F
@@ -47,8 +42,7 @@ class WorldGenClusterizer extends TWorldGenerator
         val dz = zPDir-zNDir
 
         var generated = false
-        for (i <- 0 until clusterSize)
-        {
+        for i <- 0 until clusterSize do
             val xCenter = xNDir+(dx*i)/clusterSize
             val yCenter = yNDir+(dy*i)/clusterSize
             val zCenter = zNDir+(dz*i)/clusterSize
@@ -66,25 +60,16 @@ class WorldGenClusterizer extends TWorldGenerator
             val y1 = MathHelper.floor(yCenter+vMod)
             val z1 = MathHelper.floor(zCenter+hMod)
 
-            for (blockX <- x0 to x1)
-            {
+            for blockX <- x0 to x1 do
                 var xDistSq = ((blockX+0.5f)-xCenter)/hMod
                 xDistSq *= xDistSq
-                if (xDistSq < 1f) for (blockY <- y0 to y1)
-                {
+                if xDistSq < 1f then for blockY <- y0 to y1 do
                     var yDistSq = ((blockY+0.5f)-yCenter)/vMod
                     yDistSq *= yDistSq
                     val xyDistSq = yDistSq+xDistSq
-                    if (xyDistSq < 1f) for (blockZ <- z0 to z1)
-                    {
+                    if xyDistSq < 1f then for blockZ <- z0 to z1 do
                         var zDistSq = ((blockZ+0.5f)-zCenter)/hMod
                         zDistSq *= zDistSq
-                        if (zDistSq+xyDistSq < 1f)
+                        if zDistSq+xyDistSq < 1f then
                             generated |= setBlock(w, new BlockPos(blockX, blockY, blockZ), cluster, material)
-                    }
-                }
-            }
-        }
         generated
-    }
-}

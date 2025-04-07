@@ -71,105 +71,75 @@ class SimpleTextboxNode(x:Int, y:Int, w:Int, h:Int, tq:String) extends TNode
       * @todo Make this private. Externally, [[text]] should be set directly.
       */
     def setText(t:String): Unit =
-    {
         val old = text
         text = t
-        if (old != text) textChangedDelegate()
-    }
+        if old != text then textChangedDelegate()
 
     /**
       * Sets the [[focused]] property of this text box.
       */
     def setFocused(flag:Boolean): Unit =
-    {
-        if (focused != flag)
-        {
+        if focused != flag then
             focused = flag
-            if (focused) cursorCounter = 0
+            if focused then cursorCounter = 0
             focusChangeDelegate()
-        }
-    }
 
     override def update_Impl(): Unit ={cursorCounter += 1}
 
     override def keyPressed_Impl(c:Char, keycode:Int, consumed:Boolean):Boolean =
-    {
-        if (enabled && focused && !consumed)
-        {
-            if (keycode == 1)//esc
-            {
+        if enabled && focused && !consumed then
+            if keycode == 1 then//esc
                 setFocused(false)
                 return true
-            }
 
-            if (c == '\u0016') //paste
-            {
+            if c == '\u0016' then //paste
                 val s = GuiScreen.getClipboardString
-                if (s == null || s.isEmpty) return true
-                for (c <- s) if (!tryAddChar(c)) return true
-            }
+                if s == null || s.isEmpty then return true
+                for c <- s do if !tryAddChar(c) then return true
 
-            if (keycode == Keyboard.KEY_RETURN) //enter
-            {
+            if keycode == Keyboard.KEY_RETURN then //enter
                 setFocused(false)
                 textReturnDelegate()
                 return true
-            }
 
-            if (keycode == Keyboard.KEY_BACK) tryBackspace() else tryAddChar(c)
+            if keycode == Keyboard.KEY_BACK then tryBackspace() else tryAddChar(c)
 
             true
-        }
         else false
-    }
 
     private def canAddChar(c:Char) =
-        if (allowedcharacters.isEmpty) ChatAllowedCharacters.isAllowedCharacter(c)
+        if allowedcharacters.isEmpty then ChatAllowedCharacters.isAllowedCharacter(c)
         else allowedcharacters.indexOf(c) >= 0
 
     private def tryAddChar(c:Char):Boolean =
-    {
-        if (!canAddChar(c)) return false
+        if !canAddChar(c) then return false
         val ns = text+c
-        if (GuiDraw.getStringWidth(ns) > size.width-8) return false
+        if GuiDraw.getStringWidth(ns) > size.width-8 then return false
         setText(ns)
         true
-    }
 
     private def tryBackspace():Boolean =
-    {
-        if (!text.isEmpty)
-        {
+        if !text.isEmpty then
             setText(text.substring(0, text.length-1))
             true
-        }
         else false
-    }
 
     override def mouseClicked_Impl(p:Point, button:Int, consumed:Boolean) =
-    {
-        if (!consumed && enabled && rayTest(p))
-        {
+        if !consumed && enabled && rayTest(p) then
             setFocused(true)
-            if (button == 1) setText("")
+            if button == 1 then setText("")
             true
-        }
         else
-        {
             setFocused(false)
             false
-        }
-    }
 
     override def drawBack_Impl(mouse:Point, rframe:Float): Unit =
-    {
         GuiDraw.drawRect(position.x-1, position.y-1, size.width+1, size.height+1, 0xFFA0A0A0) //todo make these colors configurable properties
         GuiDraw.drawRect(position.x, position.y, size.width, size.height, 0xFF000000)
 
-        if (text.isEmpty && phantom.nonEmpty)
+        if text.isEmpty && phantom.nonEmpty then
             GuiDraw.drawString(phantom, position.x+4, position.y+size.height/2-4, 0x404040)
 
-        val drawText = text+(if (enabled && focused && cursorCounter/6%2 == 0) "_" else "")
-        GuiDraw.drawString(drawText, position.x+4, position.y+size.height/2-4, if (enabled) 0xE0E0E0 else 0x707070)
-    }
+        val drawText = text+(if enabled && focused && cursorCounter/6%2 == 0 then "_" else "")
+        GuiDraw.drawString(drawText, position.x+4, position.y+size.height/2-4, if enabled then 0xE0E0E0 else 0x707070)
 }

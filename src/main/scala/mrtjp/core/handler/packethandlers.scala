@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
 class MrTJPCorePH
-{
+:
     val channel = MrTJPCoreMod
 
     val tilePacket = 1
@@ -26,42 +26,30 @@ class MrTJPCorePH
     val keyBindPacket = 4
 
     def handleTilePacket(world:World, packet:PacketCustom, pos:BlockPos): Unit =
-    {
-        world.getTileEntity(pos) match {
+        world.getTileEntity(pos) match
             case cpt:ICustomPacketTile => cpt.readFromPacket(packet)
             case _ =>
-        }
-    }
 
     def sendTilePacket(world:World, pos:BlockPos, packet:PacketCustom): Unit =
     {
 
     }
-}
 
 object MrTJPCoreCPH extends MrTJPCorePH with IClientPacketHandler
-{
+:
     def handlePacket(packet:PacketCustom, mc:Minecraft, nethandler:INetHandlerPlayClient): Unit =
-    {
         val world = mc.world
-        packet.getType match {
+        packet.getType match
             case this.tilePacket => handleTilePacket(world, packet, packet.readPos())
             case this.messagePacket => Messenger.addMessage(packet.readDouble, packet.readDouble, packet.readDouble, packet.readString)
             case this.guiPacket => GuiHandler.receiveGuiPacket(packet)
-        }
-    }
-}
 
 object MrTJPCoreSPH extends MrTJPCorePH with IServerPacketHandler
 {
     override def handlePacket(packet:PacketCustom, sender:EntityPlayerMP, nethandler:INetHandlerPlayServer): Unit =
-    {
         packet.getType match
-        {
             case this.tilePacket =>
                 handleTilePacket(sender.getEntityWorld, packet, packet.readPos())
             case this.keyBindPacket =>
                 KeyTracking.updatePlayerKey(packet.readUByte(), sender, packet.readBoolean())
-        }
-    }
 }

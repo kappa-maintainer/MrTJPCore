@@ -13,31 +13,24 @@ import org.apache.logging.log4j.LogManager
 
 @Mod(modid = "mrtjpcore", useMetadata = true, modLanguage = "scala", guiFactory = "mrtjp.core.handler.GuiConfigFactory")
 object MrTJPCoreMod
-{
+:
     val log = LogManager.getFormatterLogger("MrTJPCore")
 
     @Mod.EventHandler
     def preInit(event:FMLPreInitializationEvent): Unit =
-    {
         MrTJPConfig.loadConfig()
         MrTJPCoreProxy.preInit()
-    }
 
     @Mod.EventHandler
     def init(event:FMLInitializationEvent): Unit =
-    {
         MrTJPCoreProxy.init()
-    }
 
     @Mod.EventHandler
     def postInit(event:FMLPostInitializationEvent): Unit =
-    {
         MrTJPCoreProxy.postInit()
-    }
-}
 
 object MrTJPConfig extends ModConfig("mrtjpcore")
-{
+:
     var retro_gen = false
     var retro_gen_id = "mrtjp_gen"
 
@@ -47,7 +40,6 @@ object MrTJPConfig extends ModConfig("mrtjpcore")
     override def getFileName = "MrTJPCore"
 
     override protected def initValues(): Unit =
-    {
         val general = new BaseCategory("General", "General settings for MrTJPCore")
         check_versions = general.put("Version Checking", check_versions, "Flag to enable or disable the update checker.")
         check_unstable = general.put("Include Unstable", check_unstable, "Flag to set if the update checker should consider unstable builds as a new version.")
@@ -55,11 +47,8 @@ object MrTJPConfig extends ModConfig("mrtjpcore")
         val gen = new BaseCategory("World Gen", "Settings related to world generation")
         retro_gen = gen.put("Retroactive World Generation", retro_gen, "Toggle to enable retrogeneration, a feature that would allow ores to be generated after the world has been created.")
         retro_gen_id = gen.put("RetroGen ID", retro_gen_id, "The database ID that is used to store which chunks have been generated already. Changing this will cause generation to run again on the same chunk.")
-    }
-}
 
 class MrTJPConfigGui(parent:GuiScreen) extends SpecialConfigGui(parent, "mrtjpcore", MrTJPConfig.config)
 class GuiConfigFactory extends TModGuiFactory
-{
+:
     override def createConfigGui(parentScreen:GuiScreen) = new MrTJPConfigGui(parentScreen)
-}

@@ -6,12 +6,10 @@
 package mrtjp.core.vec
 
 case class Vec3(dx:Double, dy:Double, dz:Double)
-{
+:
     override def equals(obj:scala.Any) = obj match
-    {
         case that:Vec3 => dx == that.dx && dy == that.dy && dz == that.dz
         case _ => false
-    }
 
     def copy = Vec3(dx, dy, dz)
 
@@ -40,26 +38,20 @@ case class Vec3(dx:Double, dy:Double, dz:Double)
     def mag = math.sqrt(magSquared)
 
     def normalize =
-    {
         val l = mag
-        if (l == 0) Vec3.zeroVec else this/l
-    }
+        if l == 0 then Vec3.zeroVec else this/l
 
     def negate = Vec3(-dx, -dy, -dz)
 
     def scalarProject(that:Vec3):Double =
-    {
         val l = that.mag
-        if (l == 0) 0 else dot(that)/l
-    }
+        if l == 0 then 0 else dot(that)/l
 
     def project(that:Vec3):Vec3 =
-    {
         val l = that.magSquared
-        if (l == 0) return Vec3.zeroVec
+        if l == 0 then return Vec3.zeroVec
         val m = dot(that)/l
         that*m
-    }
 
     def reject(that:Vec3):Vec3 = this-project(that)
 
@@ -77,7 +69,6 @@ case class Vec3(dx:Double, dy:Double, dz:Double)
     def /(that:Double) = divide(that)
 
     override def toString = s"Vec3 @[$dx $dy $dz]"
-}
 
 object Vec3
 {

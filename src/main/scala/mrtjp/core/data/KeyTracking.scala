@@ -19,37 +19,29 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import scala.collection.mutable.{HashMap => MHashMap, Map => MMap}
 
 object KeyTracking
-{
+:
     private var idPool = 0
     private val map = MHashMap[Int, MMap[EntityPlayer, Boolean]]()
 
     def updatePlayerKey(id:Int, player:EntityPlayer, state:Boolean): Unit =
-    {
         map(id) += player -> state
-    }
 
     def registerTracker(tracker:TServerKeyTracker): Unit =
-    {
         tracker.id = idPool
         idPool += 1
         map.getOrElseUpdate(tracker.id,
             MHashMap[EntityPlayer, Boolean]().withDefaultValue(false))
-    }
 
     def isKeyDown(id:Int, player:EntityPlayer) = map(id)(player)
-}
 
 trait TServerKeyTracker
-{
+:
     var id = -1
 
     def isKeyDown(p:EntityPlayer) = KeyTracking.isKeyDown(id, p)
 
     def register(): Unit =
-    {
         KeyTracking.registerTracker(this)
-    }
-}
 
 trait TClientKeyTracker
 {
@@ -62,27 +54,20 @@ trait TClientKeyTracker
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     def tick(event:ClientTickEvent): Unit =
-    {
         val down = getIsKeyDown
-        if (down != wasDown) {
+        if down != wasDown then
             wasDown = down
-            if (Minecraft.getMinecraft.getConnection != null) {
+            if Minecraft.getMinecraft.getConnection != null then
                 KeyTracking.updatePlayerKey(getTracker.id, Minecraft.getMinecraft.player, down)
                 val packet = new PacketCustom(MrTJPCoreSPH.channel, MrTJPCoreSPH.keyBindPacket)
                 packet.writeByte(getTracker.id)
                 packet.writeBoolean(down)
                 packet.sendToServer()
-            }
-        }
-    }
 
     @SideOnly(Side.CLIENT)
     def register(): Unit =
-    {
         MinecraftForge.EVENT_BUS.register(this)
-        this match {
+        this match
             case kb:KeyBinding => ClientRegistry.registerKeyBinding(kb)
             case _ =>
-        }
-    }
 }

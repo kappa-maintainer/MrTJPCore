@@ -30,7 +30,7 @@ import scala.collection.JavaConverters._
   * @param color Background render color, in RGB format.
   */
 class TabNode(wMin:Int, hMin:Int, wMax:Int, hMax:Int, val color:Int) extends TNode
-{
+:
     def this(wMin:Int, hMin:Int, wMax:Int, hMax:Int) = this(wMin, hMin, wMax, hMax, EnumColour.LIGHT_GRAY.rgb)
 
     var currentW = wMin.asInstanceOf[Double]
@@ -46,34 +46,26 @@ class TabNode(wMin:Int, hMin:Int, wMax:Int, hMax:Int, val color:Int) extends TNo
     def isOpen = active && size.width==wMax && size.height==hMax
 
     override def drawBack_Impl(mouse:Point, rframe:Float): Unit =
-    {
-        val w = if (active) wMax else wMin
-        val h = if (active) hMax else hMin
+        val w = if active then wMax else wMin
+        val h = if active then hMax else hMin
 
-        if (w != size.width) currentW += (w-currentW)/8
-        if (h != size.height) currentH += (h-currentH)/8
+        if w != size.width then currentW += (w-currentW)/8
+        if h != size.height then currentH += (h-currentH)/8
 
         size = Size(currentW.round.toInt, currentH.round.toInt)
 
         drawBox()
         drawIcon()
-        if (isOpen)
-        {
+        if isOpen then
             drawTab()
             children.foreach(_.hidden = false)
-        }
         else children.foreach(_.hidden = true)
-    }
 
     override def drawFront_Impl(mouse:Point, rframe:Float): Unit =
-    {
-        if (rayTest(mouse))
-        {
+        if rayTest(mouse) then
             val list = ListBuffer[String]()
             buildToolTip(list)
             GuiDraw.drawMultiLineTip(mouse.x+12, mouse.y-12, list.asJava)
-        }
-    }
 
     def drawTab(): Unit ={}
 
@@ -82,36 +74,28 @@ class TabNode(wMin:Int, hMin:Int, wMax:Int, hMax:Int, val color:Int) extends TNo
     def buildToolTip(list:ListBuffer[String]): Unit ={}
 
     def drawBox(): Unit =
-    {
         val r = (color>>16&255)/255.0F
         val g = (color>>8&255)/255.0F
         val b = (color&255)/255.0F
         GlStateManager.color(r, g, b, 1)
 
         GuiLib.drawGuiBox(position.x, position.y, size.width, size.height, 0)
-    }
 
     override def mouseClicked_Impl(p:Point, button:Int, consumed:Boolean) =
-    {
-        if (!consumed && startBounds.contains(p))
-        {
+        if !consumed && startBounds.contains(p) then
             getControl.onTabClicked(this)
             true
-        }
         else false
-    }
-}
 
 /**
   * A trait that allows a [[TabNode]] to render an ItemStack overlay.
   */
 trait TStackTab extends TabNode
-{
+:
     /** The ItemStack to render as the overlay. */
     var iconStack:ItemStack = ItemStack.EMPTY
 
     abstract override def drawIcon(): Unit =
-    {
         super.drawIcon()
         GlStateManager.color(1, 1, 1, 1)
         RenderHelper.enableGUIStandardItemLighting()
@@ -121,23 +105,18 @@ trait TStackTab extends TabNode
         disableRescaleNormal()
         disableLighting()
         RenderHelper.disableStandardItemLighting()
-    }
-}
 
 /**
   * A trait that allows a [[TabNode]] to render a texture sprite overlay.
   */
 trait TIconTab extends TabNode
-{
+:
     /** The sprite to render as the overlay. */
     var icon:TextureAtlasSprite = null
 
     abstract override def drawIcon(): Unit =
-    {
         super.drawIcon()
         drawTexturedModalRect(position.x+3, position.x+3, icon, 16, 16)
-    }
-}
 
 
 /**
@@ -150,7 +129,7 @@ trait TIconTab extends TabNode
   * @param y The top right y coordinate of this node.
   */
 class TabControlNode(x:Int, y:Int) extends TNode
-{
+:
     position = Point(x, y)
     override def frame = Rect(position, Size.zeroSize)
 
@@ -162,27 +141,16 @@ class TabControlNode(x:Int, y:Int) extends TNode
       * @param tab The `TabNode` that was clicked. Must be a direct child to this node.
       */
     def onTabClicked(tab:TabNode): Unit =
-    {
-        if (tab != active)
-        {
-            if (active != null) active.active = false
+        if tab != active then
+            if active != null then active.active = false
             tab.active = true
             active = tab
-        }
         else
-        {
             tab.active = false
             active = null
-        }
-    }
 
     override def frameUpdate_Impl(mouse:Point, rframe:Float): Unit =
-    {
         var dy = 0
-        for (w <- children)
-        {
+        for w <- children do
             w.position = Point(w.position.x, dy)
             dy += w.frame.height
-        }
-    }
-}

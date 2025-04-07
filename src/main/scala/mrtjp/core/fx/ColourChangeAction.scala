@@ -9,7 +9,7 @@ import codechicken.lib.vec.Vector3
 import mrtjp.core.fx.particles.CoreParticle
 
 trait TColourParticle extends CoreParticle
-{
+:
     var rgb = Vector3.one.copy
 
     def red = rgb.x
@@ -21,43 +21,36 @@ trait TColourParticle extends CoreParticle
     def blue_=(b:Double): Unit ={rgb.z = b.toFloat}
 
     def setRGB(r:Double, g:Double, b:Double): Unit =
-    {
         red = r
         green = g
         blue = b
-    }
-}
 
 class ColourChangeToAction extends ParticleAction
-{
+:
     var target = Vector3.zero
     var duration = 0.0
 
     override def canOperate(p:CoreParticle) = p.isInstanceOf[TColourParticle]
 
     override def operate(p:CoreParticle, time:Double): Unit =
-    {
         val c = p.asInstanceOf[TColourParticle]
 
-        if (time < duration) {
+        if time < duration then
             val drgb = target.copy.subtract(c.rgb)
             val speed = drgb.copy.multiply(1/(duration-time)).multiply(deltaTime(time))
             c.rgb.add(speed)
 
-            if (c.rgb.x > 1) c.rgb.x = 1
-            if (c.rgb.y > 1) c.rgb.y = 1
-            if (c.rgb.z > 1) c.rgb.z = 1
-            if (c.rgb.x < 0) c.rgb.x = 0
-            if (c.rgb.y < 0) c.rgb.y = 0
-            if (c.rgb.z < 0) c.rgb.z = 0
-        }
+            if c.rgb.x > 1 then c.rgb.x = 1
+            if c.rgb.y > 1 then c.rgb.y = 1
+            if c.rgb.z > 1 then c.rgb.z = 1
+            if c.rgb.x < 0 then c.rgb.x = 0
+            if c.rgb.y < 0 then c.rgb.y = 0
+            if c.rgb.z < 0 then c.rgb.z = 0
         else isFinished = true
-    }
 
     override def compile(p:CoreParticle): Unit ={}
 
     override def copy = ParticleAction.changeColourTo(target.x, target.y, target.z, duration)
-}
 
 class ColourChangeForAction extends ParticleAction
 {
@@ -67,19 +60,16 @@ class ColourChangeForAction extends ParticleAction
     override def canOperate(p:CoreParticle) = p.isInstanceOf[TColourParticle]
 
     override def operate(p:CoreParticle, time:Double): Unit =
-    {
         val c = p.asInstanceOf[TColourParticle]
-        if (time < duration) {
+        if time < duration then
             c.rgb.add(delta.copy.multiply(deltaTime(time)))
-            if (c.rgb.x > 1) c.rgb.x = 1
-            if (c.rgb.y > 1) c.rgb.y = 1
-            if (c.rgb.z > 1) c.rgb.z = 1
-            if (c.rgb.x < 0) c.rgb.x = 0
-            if (c.rgb.y < 0) c.rgb.y = 0
-            if (c.rgb.z < 0) c.rgb.z = 0
-        }
+            if c.rgb.x > 1 then c.rgb.x = 1
+            if c.rgb.y > 1 then c.rgb.y = 1
+            if c.rgb.z > 1 then c.rgb.z = 1
+            if c.rgb.x < 0 then c.rgb.x = 0
+            if c.rgb.y < 0 then c.rgb.y = 0
+            if c.rgb.z < 0 then c.rgb.z = 0
         else isFinished = true
-    }
 
     override def compile(p:CoreParticle): Unit ={}
 

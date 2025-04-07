@@ -22,11 +22,11 @@ import net.minecraftforge.fml.common.{FMLCommonHandler, Loader}
 import scala.collection.JavaConverters._
 
 abstract class ModConfig(modID:String)
-{
+:
     var config:Configuration = null
 
     protected case class BaseCategory(key:String, comment:String = "")
-    {
+    :
         def cat = config.getCategory(key)
         cat.setComment(comment)
 
@@ -37,82 +37,62 @@ abstract class ModConfig(modID:String)
             put(key, value, comment, false)
 
         def put[T](key:String, value:T, comment:String, force:Boolean):T =
-        {
             import net.minecraftforge.common.config.Property.Type._
             def getType(value:Any):Property.Type = value match
-            {
                 case xs:Array[_] => getType(xs.head)
                 case b:Boolean   => BOOLEAN
                 case i:Int       => INTEGER
                 case s:String    => STRING
                 case d:Double    => DOUBLE
                 case _           => STRING
-            }
 
             val propType = getType(value)
             var prop = value match
-            {
                 case t:Array[_] => new Property(key, t.map(_.toString), propType)
                 case _ => new Property(key, value.toString, propType)
-            }
 
             prop.setComment(comment)
-            if (force || !cat.containsKey(key)) cat.put(key, prop)
+            if force || !cat.containsKey(key) then cat.put(key, prop)
             prop = cat.get(key)
 
             val reslult = value match
-            {
                 case xs:Array[_]    => propType match
-                {
                     case BOOLEAN    => prop.getBooleanList
                     case INTEGER    => prop.getIntList
                     case STRING     => prop.getStringList
                     case DOUBLE     => prop.getDoubleList
                     case _          => prop.getStringList
-                }
                 case b:Boolean      => prop.getBoolean
                 case i:Int          => prop.getInt
                 case s:String       => prop.getString
                 case d:Double       => prop.getDouble
                 case _              => prop.getString
-            }
             reslult.asInstanceOf[T]
-        }
 
         def containsKey(key:Any) = cat.containsKey(key.toString)
-    }
 
     def getFileName = modID
 
     private var registered = false
     def loadConfig(): Unit =
-    {
         config = new Configuration(new File(Loader.instance.getConfigDir, getFileName+".cfg"))
         initValues()
-        if (config.hasChanged) config.save()
+        if config.hasChanged then config.save()
 
-        if (!registered)
-        {
+        if !registered then
             FMLCommonHandler.instance.bus.register(this)
             registered = true
-        }
-    }
 
     @SubscribeEvent
     def onConfigChanged(event:ConfigChangedEvent.OnConfigChangedEvent): Unit =
-    {
-        if (event.getModID == modID)
-        {
+        if event.getModID == modID then
             initValues()
             config.save()
-        }
-    }
 
     protected def initValues(): Unit 
-}
 
 object SpecialConfigGui
-{
+:
     def buildCategories(config:Configuration):JAList[IConfigElement] =
         new JAList[IConfigElement](config.getCategoryNames.asScala.map(s =>
         {
@@ -121,13 +101,11 @@ object SpecialConfigGui
                 override def getComment = config.getCategory(s).getComment
             }
         }).asJava)
-}
 
 class SpecialConfigGui(parent:GuiScreen, modid:String, config:Configuration) extends GuiConfig(parent, SpecialConfigGui.buildCategories(config), modid, false, false, GuiConfig.getAbridgedConfigPath(config.toString))
 
 trait TModGuiFactory extends IModGuiFactory
-{
+:
     override def initialize(minecraftInstance: Minecraft): Unit ={}
     override def runtimeGuiCategories() = null
     override def hasConfigGui = true
-}

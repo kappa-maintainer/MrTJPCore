@@ -10,7 +10,7 @@ import mrtjp.core.fx.particles.CoreParticle
 import net.minecraft.util.math.BlockPos
 
 trait TPositionedParticle extends CoreParticle
-{
+:
     //Implement manually because x, y, z are protected now
     def x:Double
     def y:Double
@@ -36,53 +36,41 @@ trait TPositionedParticle extends CoreParticle
     def prevPosition = new Vector3(px, py, pz)
 
     def setPos(pos:Vector3): Unit =
-    {
         setPosition(pos.x, pos.y, pos.z)
-    }
 
     def setPrevPos(pos:Vector3): Unit =
-    {
         px = pos.x
         py = pos.y
         pz = pos.z
-    }
 
     def blockPosition = new BlockPos(math.floor(x).toInt, math.floor(y).toInt, math.floor(z).toInt)
 
     abstract override def onUpdate(): Unit =
-    {
         super.onUpdate()
         px = x
         py = y
         pz = z
-    }
-}
 
 class PositionChangeToAction extends ParticleAction
-{
+:
     var target = Vector3.zero
     var duration = 0.0
 
     override def canOperate(p:CoreParticle) = p.isInstanceOf[TPositionedParticle]
 
     override def operate(p:CoreParticle, time:Double): Unit =
-    {
         val pp = p.asInstanceOf[TPositionedParticle]
 
         val pos = pp.position
-        if (time < duration)
-        {
+        if time < duration then
             val dpos = target.copy.subtract(pos)
             val speed = dpos.copy.multiply(1/(duration-time)).multiply(deltaTime(time))
             pp.setPos(pos.add(speed))
-        }
         else isFinished = true
-    }
 
     override def compile(p:CoreParticle): Unit ={}
 
     override def copy = ParticleAction.moveTo(target.x, target.y, target.z, duration)
-}
 
 class PositionChangeForAction extends ParticleAction
 {
@@ -92,11 +80,9 @@ class PositionChangeForAction extends ParticleAction
     override def canOperate(p:CoreParticle) = p.isInstanceOf[TPositionedParticle]
 
     override def operate(p:CoreParticle, time:Double): Unit =
-    {
         val pp = p.asInstanceOf[TPositionedParticle]
-        if (time < duration) pp.setPos(pp.position.add(delta.copy.multiply(deltaTime(time))))
+        if time < duration then pp.setPos(pp.position.add(delta.copy.multiply(deltaTime(time))))
         else isFinished = true
-    }
 
     override def compile(p:CoreParticle): Unit ={}
 

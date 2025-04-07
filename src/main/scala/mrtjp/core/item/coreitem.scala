@@ -22,18 +22,17 @@ import java.util.{List => JList}
 import scala.collection.JavaConverters._
 
 class ItemCore extends Item
-{
+:
     override def getTranslationKey(stack:ItemStack):String =
-        if (hasSubtypes) getTranslationKey()+"|"+stack.getItemDamage
+        if hasSubtypes then getTranslationKey()+"|"+stack.getItemDamage
         else getTranslationKey()
-}
 
 /**
  * Object that collects defs for all subtypes of this item if it has any.
  * Extend ItemDefinition as enum object.
  */
 abstract class ItemDefinition extends Enum
-{
+:
     type EnumVal <: ItemDef
 
     def getItem:Item
@@ -48,16 +47,14 @@ abstract class ItemDefinition extends Enum
 
     def fromMeta(meta:Int):EnumVal = metaToDef.getOrElse(meta, null.asInstanceOf[EnumVal])
 
-    def createStringList():JList[String] = {
+    def createStringList():JList[String] =
         val l: JList[String] = new util.ArrayList[String](values.size)
-        for (d <- values) {
+        for d <- values do
             l.add(d.ordinal, d.getVariantName.toLowerCase)
-        }
         l
-    }
 
     class ItemDef(variantName:String) extends Value with IStringSerializable
-    {
+    :
         val meta = ordinal
 
         metaToDef += meta -> this.asInstanceOf[EnumVal]
@@ -69,6 +66,4 @@ abstract class ItemDefinition extends Enum
 
         def makeStack:ItemStack = makeStack(1)
         def makeStack(i:Int) = new ItemStack(getItem, i, meta)
-    }
-}
 

@@ -20,7 +20,7 @@ import net.minecraft.util.text.TextFormatting
 import scala.collection.JavaConverters._
 
 class ItemListNode extends TNode
-{
+:
     var items = Seq[ItemKeyStack]()
     var itemSize = Size(16, 16)
     var gridWidth = 3
@@ -33,40 +33,31 @@ class ItemListNode extends TNode
     override def frame = Rect(position, itemSize.multiply(math.min(items.size, gridWidth), items.size/gridWidth+1))
 
     def reset(): Unit =
-    {
         val it = items.iterator
         var (x, y) = (0, 0)
 
         dispNodes.foreach(_.removeFromParent())
         dispNodes = Seq()
 
-        while(it.hasNext)
-        {
+        while it.hasNext do
             val i = it.next()
             val d = displayNodeFactory(i)
-            if (d != null)
-            {
+            if d != null then
                 d.stack = i
                 d.size = itemSize
                 d.position = Point(itemSize.multiply(x, y))
                 addChild(d)
 
                 val df = convertRectToScreen(d.frame)
-                if (cullFrame.intersects(df))
-                {
+                if cullFrame.intersects(df) then
                     dispNodes :+= d
-                }
                 else d.removeFromParent()
 
                 x += 1
-                if (x >= gridWidth){x = 0; y += 1}
-            }
-        }
-    }
-}
+                if x >= gridWidth then {x = 0; y += 1}
 
 class ItemDisplayNode extends TNode
-{
+:
     var stack:ItemKeyStack = null
     var size = Size.zeroSize
 
@@ -79,54 +70,41 @@ class ItemDisplayNode extends TNode
     override def frame = Rect(position, size)
 
     override def drawBack_Impl(mouse:Point, rframe:Float): Unit =
-    {
         GuiDraw.drawRect(position.x, position.y, size.width, size.height, backgroundColour)
         ItemDisplayNode.renderItem(position, size, zPosition, drawNumber, stack.makeStack)
-    }
 
     override def mouseClicked_Impl(p:Point, button:Int, consumed:Boolean) =
-    {
-        if (!consumed && rayTest(p))
-        {
+        if !consumed && rayTest(p) then
             clickDelegate()
             true
-        }
         else false
-    }
 
     override def drawFront_Impl(mouse:Point, rframe:Float): Unit =
-    {
-        if (drawTooltip && frame.contains(mouse) && rayTest(mouse))
+        if drawTooltip && frame.contains(mouse) && rayTest(mouse) then
             drawTooltip(mouse)
-    }
 
     def drawTooltip(mouse:Point): Unit =
-    {
         ClipNode.tempDisableScissoring()
         //draw tooltip with absolute coords to allow it to force-fit on screen
         translateToScreen()
         val Point(mx, my) = parent.convertPointToScreen(mouse)
 
         val lines = stack.makeStack.getTooltip(mcInst.player,
-            if(mcInst.gameSettings.advancedItemTooltips) ADVANCED else NORMAL)
+            if mcInst.gameSettings.advancedItemTooltips then ADVANCED else NORMAL)
         val l2 = Seq(lines.asScala.head)++lines.asScala.tail.map(TextFormatting.GRAY.toString + _)
         GuiDraw.drawMultiLineTip(mx+12, my-12, l2.asJava)
 
         translateFromScreen()
         ClipNode.tempEnableScissoring()
-    }
-}
 
 object ItemDisplayNode
-{
+:
     val renderItem = Minecraft.getMinecraft.getRenderItem
 
     def renderItem(position:Point, size:Size, zPosition:Double, drawNumber:Boolean, stack:ItemStack): Unit =
-    {
-        val font = stack.getItem.getFontRenderer(stack) match {
+        val font = stack.getItem.getFontRenderer(stack) match
             case null => Minecraft.getMinecraft.fontRenderer
             case r => r
-        }
 
         val f = font.getUnicodeFlag
         font.setUnicodeFlag(true)
@@ -145,24 +123,20 @@ object ItemDisplayNode
         disableDepth()
         renderItem.zLevel = zPosition.toFloat
 
-        if (drawNumber)
-        {
+        if drawNumber then
             val s =
-                if (stack.getCount == 1) ""
-                else if (stack.getCount < 1000) stack.getCount+""
-                else if (stack.getCount < 100000) stack.getCount/1000+"K"
-                else if (stack.getCount < 1000000) "0."+stack.getCount/100000+"M"
+                if stack.getCount == 1 then ""
+                else if stack.getCount < 1000 then stack.getCount+""
+                else if stack.getCount < 100000 then stack.getCount/1000+"K"
+                else if stack.getCount < 1000000 then "0."+stack.getCount/100000+"M"
                 else stack.getCount/1000000+"M"
             font.drawStringWithShadow(s, position.x+19-2-font.getStringWidth(s), position.y+6+3, 16777215)
-        }
         popMatrix()
         glItemPost()
 
         font.setUnicodeFlag(f)
-    }
 
     def glItemPre(): Unit =
-    {
         pushMatrix()
         color(1.0F, 1.0F, 1.0F, 1.0F)
         RenderHelper.enableGUIStandardItemLighting()
@@ -170,12 +144,8 @@ object ItemDisplayNode
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240/1.0F, 240/1.0F)
         disableDepth()
         disableLighting()
-    }
 
     def glItemPost(): Unit =
-    {
         enableDepth()
         popMatrix()
-    }
 
-}

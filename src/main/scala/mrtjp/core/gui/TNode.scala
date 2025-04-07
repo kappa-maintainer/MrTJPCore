@@ -31,7 +31,7 @@ import net.minecraft.client.renderer.texture.TextureManager
   *
   */
 trait TNode extends Gui
-{
+:
     /**
       * The parent of this node. This will be null if this node is not added to a
       * tree or if it is the root node.
@@ -87,14 +87,11 @@ trait TNode extends Gui
       * @throws IllegalStateException If there there is no root node of type [[NodeGui]].
       */
     def getRoot:NodeGui =
-    {
-        def iterate(node:TNode):NodeGui = node match {
+        def iterate(node:TNode):NodeGui = node match
             case ng:NodeGui => ng
             case null => throw new IllegalStateException("Incomplete tree")
             case _ => iterate(node.parent)
-        }
         iterate(this)
-    }
 
     /**
       * Builds a list of all nodes between and this node and the given `to` node.
@@ -105,16 +102,13 @@ trait TNode extends Gui
       *         of this tree if it was not found on the way up.
       */
     def buildParentHierarchy(to:TNode) =
-    {
         var hierarchy = Seq.newBuilder[TNode]
-        def iterate(node:TNode): Unit = {
+        def iterate(node:TNode): Unit =
             hierarchy += node
-            if (node.isRoot || node == to) return
+            if node.isRoot || node == to then return
             iterate(node.parent)
-        }
         iterate(this)
         hierarchy.result()
-    }
 
     /** Checks if this node is an ancestor of `someAncestor`. */
     def isDecendantOf(someAncestor:TNode) =
@@ -126,22 +120,19 @@ trait TNode extends Gui
 
     /** Converts point `p` from this node's coordinate system to `to`'s coordinate system. */
     def convertPointTo(p:Point, to:TNode):Point =
-    {
         def fold(low:TNode, high:TNode, p:Point)(op:(Point, TNode) => Point) =
             low.buildParentHierarchy(high).dropRight(1).foldLeft(p)(op)
 
         def convertUp(low:TNode, high:TNode, p:Point) = fold(low, high, p){_+_.position}
         def convertDown(high:TNode, low:TNode, p:Point) = fold(low, high, p){_-_.position}
 
-        if (this == to) p
+        if this == to then p
 //        else if (this isDecendantOf to) convertUp(this, to, p)
 //        else if (to isDecendantOf this) convertDown(this, to, p)
-        else if (this isRelativeOf to) { //TODO see if this still works...
+        else if this `isRelativeOf` to then //TODO see if this still works...
             val root = getRoot
             convertDown(root, to, convertUp(this, root, p))
-        }
         else throw new Exception("Attempted to convert points between unrelated nodes.")
-    }
     /** Converts point `p` from `from`'s coordinate system to this node's coordinate system. */
     def convertPointFrom(p:Point, from:TNode):Point = from.convertPointTo(p, this)
     /** Converts point `p` from this node's coordinate system to screen space. */
@@ -164,11 +155,9 @@ trait TNode extends Gui
       * @return A [[Rect]] object that encapsulates all bounding boxes of decendants. This excludes nodes that are [[hidden]].
       */
     def calculateChildrenFrame:Rect =
-    {
-        val rect = if (children.isEmpty) Rect.zeroRect
-            else children.filterNot(_.hidden).map(_.calculateAccumulatedFrame).reduceLeft(_ union _)
+        val rect = if children.isEmpty then Rect.zeroRect
+            else children.filterNot(_.hidden).map(_.calculateAccumulatedFrame).reduceLeft(_ `union` _)
         Rect(convertPointTo(rect.origin, parent), rect.size)
-    }
 
     /**
       * Calculates a bounding box containing this node and all decendents.
@@ -187,11 +176,9 @@ trait TNode extends Gui
       * @todo Change `absPoint` to be in local space to avoid multiple conversions during hit testing
       */
     def traceHit(absPoint:Point) =
-    {
         val f = frame
         val af = Rect(parent.convertPointToScreen(f.origin), f.size)
         af.contains(absPoint)
-    }
 
     /**
       * Utility function used for hit testing on the tree. The given point `point` should reside in the same coordinate
@@ -205,17 +192,15 @@ trait TNode extends Gui
       *       space.
       */
     def hitTest(point:Point):Seq[TNode] =
-    {
-        if (parent == null) throw new Exception("Cannot hittest a node without a parent.")
-        if (isRoot) throw new Exception("Cannot hittest a root node.")
+        if parent == null then throw new Exception("Cannot hittest a node without a parent.")
+        if isRoot then throw new Exception("Cannot hittest a root node.")
 
         var test = Seq.newBuilder[TNode]
         val ap = parent.convertPointToScreen(point)
-        for (c <- getRoot.subTree(true))
-            if (c.traceHit(ap)) test += c
+        for c <- getRoot.subTree(true) do
+            if c.traceHit(ap) then test += c
 
         test.result().sortBy(_.zPosition).reverse //todo instead of reversing, order by -zPosition
-    }
 
     /**
       * Utility function used for testing if this node is at the top of a hit test of point `point`.
@@ -224,10 +209,8 @@ trait TNode extends Gui
       * @return True if this node was hit and no other nodes occluded it.
       */
     def rayTest(point:Point):Boolean =
-    {
         val s = hitTest(point)
         s.nonEmpty && s.head == this
-    }
 
     /**
       * Creates a sequence of all of this node's descendants.
@@ -237,16 +220,13 @@ trait TNode extends Gui
       * @return A sequence of all descendants.
       */
     def subTree(activeOnly:Boolean = false) =
-    {
         val s = Seq.newBuilder[TNode]
-        def gather(children:Seq[TNode]): Unit = {
-            val ac = if (activeOnly) children.filter(c => !c.hidden && c.userInteractionEnabled) else children
+        def gather(children:Seq[TNode]): Unit =
+            val ac = if activeOnly then children.filter(c => !c.hidden && c.userInteractionEnabled) else children
             s ++= ac
-            for (c <- ac) gather(c.children)
-        }
-        if (!activeOnly || (!hidden && userInteractionEnabled)) gather(children)
+            for c <- ac do gather(c.children)
+        if !activeOnly || (!hidden && userInteractionEnabled) then gather(children)
         s.result()
-    }
 
     /**
       * Changes the [[zPosition]] of this node to `z` and adjusts all subnodes to have the same relative z-position
@@ -255,9 +235,7 @@ trait TNode extends Gui
       * @param z The new z-position for this node.
       */
     def pushZTo(z:Double): Unit =
-    {
         pushZBy(z-zPosition)
-    }
 
     /**
       * Adds `z` to this node's [[zPosition]] and adjusts all subnodes to have the same relative z-position
@@ -266,25 +244,19 @@ trait TNode extends Gui
       * @param z The value to add to this node's z-position.
       */
     def pushZBy(z:Double): Unit =
-    {
-        for (c <- subTree():+this)
+        for c <- subTree():+this do
             c.zPosition += z
-    }
 
     /** Adds node `w` to the tree as this node's child. */
     def addChild(w:TNode) =
-    {
         w.parent = this
         children :+= w
         w.onAddedToParent_Impl()
-    }
 
     /** Removes this node and all descendant nodes from the tree. */
     def removeFromParent(): Unit =
-    {
         parent.children = parent.children.filterNot(_ == this)
         parent = null
-    }
 
     /** Creates a sequence of all descendants of this node, sorted by [[zPosition]]. */
     def childrenByZ = children.sortBy(_.zPosition)
@@ -293,135 +265,87 @@ trait TNode extends Gui
     def familyByZ = (Seq(this)++children).sortBy(_.zPosition)
 
     protected[gui] final def update(): Unit =
-    {
         update_Impl()
-        for (c <- childrenByZ) c.update()
-    }
+        for c <- childrenByZ do c.update()
 
     protected[gui] final def frameUpdate(mouse:Point, rframe:Float): Unit =
-    {
         frameUpdate_Impl(mouse, rframe)
-        for (c <- childrenByZ) c.frameUpdate(mouse-position, rframe)
-    }
+        for c <- childrenByZ do c.frameUpdate(mouse-position, rframe)
 
     private final def operate2(consumed:Boolean)(self:(Boolean) => Boolean)(sub:(TNode, Boolean) => Boolean) =
-    {
-        familyByZ.reverse.foldLeft(consumed)((c, w) => (if (w == this) self(c) else sub(w, c)) || c)
-    }
+        familyByZ.reverse.foldLeft(consumed)((c, w) => (if w == this then self(c) else sub(w, c)) || c)
 
     protected[gui] def mouseClicked(p:Point, button:Int, consumed:Boolean):Boolean =
-    {
-        if (hidden || !userInteractionEnabled) return false
+        if hidden || !userInteractionEnabled then return false
         val dp = p-position
         operate2(consumed){mouseClicked_Impl(p, button, _)}{_.mouseClicked(dp, button, _)}
-    }
 
     protected[gui] def mouseReleased(p:Point, button:Int, consumed:Boolean):Boolean =
-    {
-        if (hidden || !userInteractionEnabled) return false
+        if hidden || !userInteractionEnabled then return false
         val dp = p-position
         operate2(consumed){mouseReleased_Impl(p, button, _)}{_.mouseReleased(dp, button, _)}
-    }
 
     protected[gui] def mouseDragged(p:Point, button:Int, time:Long, consumed:Boolean):Boolean =
-    {
-        if (hidden || !userInteractionEnabled) return false
+        if hidden || !userInteractionEnabled then return false
         val dp = p-position
         operate2(consumed){mouseDragged_Impl(p, button, time, _)}{_.mouseDragged(dp, button, time, _)}
-    }
 
     protected[gui] def mouseScrolled(p:Point, dir:Int, consumed:Boolean):Boolean =
-    {
-        if (hidden || !userInteractionEnabled) return false
+        if hidden || !userInteractionEnabled then return false
         val dp = p-position
         operate2(consumed){mouseScrolled_Impl(p, dir, _)}{_.mouseScrolled(dp, dir, _)}
-    }
 
     protected[gui] def keyPressed(ch:Char, keycode:Int, consumed:Boolean):Boolean =
-    {
-        if (hidden || !userInteractionEnabled) return false
+        if hidden || !userInteractionEnabled then return false
         operate2(consumed){keyPressed_Impl(ch, keycode, _)}{_.keyPressed(ch, keycode, _)}
-    }
 
     protected[gui] def drawBack(mouse:Point, rframe:Float): Unit =
-    {
-        if (!hidden)
-        {
+        if !hidden then
             val dp = mouse-position
-            for (n <- familyByZ)
-            {
-                if (n == this) drawBack_Impl(mouse, rframe)
+            for n <- familyByZ do
+                if n == this then drawBack_Impl(mouse, rframe)
                 else
-                {
                     translateTo()
                     n.drawBack(dp, rframe)
                     translateFrom()
-                }
-            }
-        }
-    }
 
     protected[gui] def drawFront(mouse:Point, rframe:Float): Unit =
-    {
-        if (!hidden)
-        {
+        if !hidden then
             val dp = mouse-position
-            for (n <- familyByZ)
-            {
-                if (n == this) drawFront_Impl(mouse, rframe)
+            for n <- familyByZ do
+                if n == this then drawFront_Impl(mouse, rframe)
                 else
-                {
                     translateTo()
                     n.drawFront(dp, rframe)
                     translateFrom()
-                }
-            }
-        }
-    }
 
     //todo move to NodeGui.
     protected[gui] def rootDrawBack(mouse:Point, rframe:Float): Unit =
-    {
-        if (!hidden)
-        {
+        if !hidden then
             translateTo()
             val dp = mouse-position
-            for (n <- familyByZ)
-            {
-                if (n == this) drawBack_Impl(mouse, rframe)
+            for n <- familyByZ do
+                if n == this then drawBack_Impl(mouse, rframe)
                 else n.drawBack(dp, rframe)
-            }
             translateFrom()
-        }
-    }
 
     //todo move to NodeGui.
     protected[gui] def rootDrawFront(mouse:Point, rframe:Float): Unit =
-    {
-        if (!hidden)
-        {
+        if !hidden then
             val dp = mouse-position
-            for (n <- familyByZ)
-            {
-                if (n == this) drawFront_Impl(mouse, rframe)
+            for n <- familyByZ do
+                if n == this then drawFront_Impl(mouse, rframe)
                 else n.drawFront(dp, rframe)
-            }
-        }
-    }
 
     protected[gui] def translateTo(): Unit ={translate(position.x, position.y, 0)}//zPosition-(if (parent == null) 0 else parent.zPosition))}
     protected[gui] def translateFrom(): Unit ={translate(-position.x, -position.y, 0)}// -(zPosition-(if (parent == null) 0 else parent.zPosition)))}
 
     protected[gui] def translateToScreen(): Unit =
-    {
         val Point(sx, sy) = parent.convertPointToScreen(Point.zeroPoint)
         translate(-sx, -sy, 0)
-    }
     protected[gui] def translateFromScreen(): Unit =
-    {
         val Point(sx, sy) = parent.convertPointToScreen(Point.zeroPoint)
         translate(sx, sy, 0)
-    }
 
     /** IMPLEMENTATION OVERRIDES **/
 
@@ -518,4 +442,3 @@ trait TNode extends Gui
       * @param rframe The partial frame until the next frame.
       */
     def drawFront_Impl(mouse:Point, rframe:Float): Unit ={}
-}

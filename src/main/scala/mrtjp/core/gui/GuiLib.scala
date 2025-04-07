@@ -48,12 +48,10 @@ object GuiLib
       * @return Sequence of tuples representing (x, y) coordinates.
       */
     def createGrid(x:Int, y:Int, w:Int, h:Int, dx:Int, dy:Int) =
-    {
         var grid = Seq[(Int, Int)]()
-        for (iy <- 0 until h) for (ix <- 0 until w)
+        for iy <- 0 until h do for ix <- 0 until w do
             grid :+= ((x+ix*dx) -> (y+iy*dy))
         grid
-    }
 
     /**
       * Draws the standard Minecraft player inventory background. This background contains the 9x3 grid of slots
@@ -63,12 +61,10 @@ object GuiLib
       * @param y The y coordinate of the top-left position of the slots to be rendered.
       */
     def drawPlayerInvBackground(x:Int, y:Int): Unit =
-    {
-        for ((x, y) <- createSlotGrid(x, y, 9, 3, 0, 0))
+        for (x, y) <- createSlotGrid(x, y, 9, 3, 0, 0) do
             drawSlotBackground(x-1, y-1)
-        for ((x, y) <- createSlotGrid(x, y+58, 9, 1, 0, 0))
+        for (x, y) <- createSlotGrid(x, y+58, 9, 1, 0, 0) do
             drawSlotBackground(x-1, y-1)
-    }
 
     /**
       * Draws the standard Minecraft inventory slot that is found in inventory GUIs.
@@ -77,7 +73,6 @@ object GuiLib
       * @param y The y coordinate of the top-left position of the slot to be rendered.
       */
     def drawSlotBackground(x:Int, y:Int): Unit =
-    {
         color(1, 1, 1, 1)
 
         TextureUtils.changeTexture(guiSlot)
@@ -89,7 +84,6 @@ object GuiLib
         vb.pos(x+18, y, 0).tex(1, 0).endVertex()
         vb.pos(x, y, 0).tex(0, 0).endVertex()
         rs.draw()
-    }
 
     /**
       * Draws the standard GUI box typically used as background to a GUI.
@@ -101,9 +95,7 @@ object GuiLib
       * @param zLevel The z-position of the box.
       */
     def drawGuiBox(x:Int, y:Int, width:Int, height:Int, zLevel:Float): Unit =
-    {
         drawGuiBox(x, y, width, height, zLevel, true, true, true, true)
-    }
 
     /**
       * Draws the standard GUI box typically used as background to a GUI.
@@ -120,7 +112,6 @@ object GuiLib
       * @param right True if should render the right edge.
       */
     def drawGuiBox(x:Int, y:Int, width:Int, height:Int, zLevel:Float, top:Boolean, left:Boolean, bottom:Boolean, right:Boolean): Unit =
-    {
         val u = 1
         val v = 29
 
@@ -133,44 +124,35 @@ object GuiLib
         scale(width-4, height-4, 0)
         GuiDraw.drawTexturedModalRect(0, 0, u+19, v, 1, 1)
         popMatrix()
-        if (top)
-        {
+        if top then
             pushMatrix()
             translate(x+3, y, 0)
             scale(width-6, 1, 0)
             GuiDraw.drawTexturedModalRect(0, 0, u+4, v, 1, 3)
             popMatrix()
-        }
-        if (bottom)
-        {
+        if bottom then
             pushMatrix()
             translate(x+3, y+height-3, 0)
             scale(width-6, 1, 0)
             GuiDraw.drawTexturedModalRect(0, 0, u+14, v, 1, 3)
             popMatrix()
-        }
-        if (left)
-        {
+        if left then
             pushMatrix()
             translate(x, y+3, 0)
             scale(1, height-6, 0)
             GuiDraw.drawTexturedModalRect(0, 0, u, v+4, 3, 1)
             popMatrix()
-        }
-        if (right)
-        {
+        if right then
             pushMatrix()
             translate(x+width-3, y+3, 0)
             scale(1, height-6, 0)
             GuiDraw.drawTexturedModalRect(0, 0, u+8, v, 3, 1)
             popMatrix()
-        }
 
-        if (top && left) GuiDraw.drawTexturedModalRect(x, y, u, v, 4, 4)
-        if (top && right) GuiDraw.drawTexturedModalRect(x+width-3, y, u+5, v, 3, 3)
-        if (bottom && left) GuiDraw.drawTexturedModalRect(x, y+height-3, u+11, v, 3, 3)
-        if (bottom && right) GuiDraw.drawTexturedModalRect(x+width-4, y+height-4, u+15, v, 4, 4)
-    }
+        if top && left then GuiDraw.drawTexturedModalRect(x, y, u, v, 4, 4)
+        if top && right then GuiDraw.drawTexturedModalRect(x+width-3, y, u+5, v, 3, 3)
+        if bottom && left then GuiDraw.drawTexturedModalRect(x, y+height-3, u+11, v, 3, 3)
+        if bottom && right then GuiDraw.drawTexturedModalRect(x+width-4, y+height-4, u+15, v, 4, 4)
 
     /**
       * Draws a vertical progress bar anchored at the bottom left.
@@ -184,7 +166,5 @@ object GuiLib
       * @param prog The percentage progress of the bar, 100 being full at the top and 0 being empty at the bottom.
       */
     def drawVerticalTank(x:Int, y:Int, u:Int, v:Int, w:Int, h:Int, prog:Int): Unit =
-    {
         GuiDraw.drawTexturedModalRect(x, y+h-prog, u, v+h-prog, w, prog)
-    }
 }

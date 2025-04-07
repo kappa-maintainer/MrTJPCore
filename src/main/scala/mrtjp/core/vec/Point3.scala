@@ -8,12 +8,10 @@ package mrtjp.core.vec
 import net.minecraft.util.math.BlockPos
 
 case class Point3(x:Int, y:Int, z:Int)
-{
+:
     override def equals(obj:scala.Any) = obj match
-    {
         case Point3(x1, y1, z1) => x == x1 && y == y1 && z == z1
         case _ => false
-    }
 
     def copy = Point3(x, y, z)
 
@@ -54,10 +52,9 @@ case class Point3(x:Int, y:Int, z:Int)
     def /(that:Int) = divide(that)
 
     override def toString = s"Point3 @[$x $y $z]"
-}
 
 object Point3
-{
+:
     val infinitePoint = Point3(Int.MaxValue, Int.MaxValue, Int.MaxValue)
     val zeroPoint = Point3(0, 0, 0)
 
@@ -73,4 +70,3 @@ object Point3
     def apply(vec3:Vec3):Point3 = Point3(vec3.dx.toInt, vec3.dy.toInt, vec3.dz.toInt)
 
     def apply(pos:BlockPos):Point3 = Point3(pos.getX, pos.getY, pos.getZ)
-}

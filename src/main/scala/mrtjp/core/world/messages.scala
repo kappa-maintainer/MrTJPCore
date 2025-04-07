@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL11
 import scala.collection.mutable
 
 object Messenger
-{
+:
     val messages = mutable.ListBuffer[Message]()
     val options = Seq[MailOption](Replace, Combine)
 
@@ -38,24 +38,21 @@ object Messenger
      * @param mail
      */
     def addMessage(x: Double, y: Double, z: Double, mail: String): Unit =
-    {
         val location = new BlockPos(Math.floor(x).asInstanceOf[Int], Math.floor(y).asInstanceOf[Int], Math.floor(z).asInstanceOf[Int])
 
         val mess = new Message().set(location, x, y, z, mail)
 
         options.foreach(op => op.modify(mess))
 
-        if (messages.size > 64) messages.remove(0)
+        if messages.size > 64 then messages.remove(0)
 
         messages += mess
-    }
 
     @SubscribeEvent
     def renderMessages(event:RenderWorldLastEvent): Unit =
-    {
         val w = Minecraft.getMinecraft.world
-        if (w == null) return
-        if (Messenger.messages.isEmpty) return
+        if w == null then return
+        if Messenger.messages.isEmpty then return
 
         val deathTime = System.currentTimeMillis-3000L
 
@@ -73,8 +70,8 @@ object Messenger
         enableBlend()
         blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
 
-        for (m <- Messenger.messages.clone())
-            if (m == null || m.receivedOn < deathTime) Messenger.messages -= m
+        for m <- Messenger.messages.clone() do
+            if m == null || m.receivedOn < deathTime then Messenger.messages -= m
             else readMessage(m, Minecraft.getMinecraft.world.getTotalWorldTime+event.getPartialTicks)
 
         enableLighting()
@@ -82,18 +79,15 @@ object Messenger
         color(1, 1, 1, 1)
         popMatrix()
         popAttrib()
-    }
 
     private def readMessage(m:Message, time:Double): Unit =
-    {
         var width = 0
         var height = 0
         val lines = m.msg.split("\n")
         val fr = Minecraft.getMinecraft.fontRenderer
-        for (line <- lines) {
+        for line <- lines do
             height += fr.FONT_HEIGHT + 4
             width = Math.max(width, fr.getStringWidth(line))
-        }
 
         width += 2
         var scaling: Float = 0.02666667F
@@ -126,63 +120,44 @@ object Messenger
         enableTexture2D()
 
         var i = 0
-        for (line <- lines) {
+        for line <- lines do
             fr.drawString(line, -fr.getStringWidth(line)/2, 10*i, -1)
             i += 1
-        }
         popMatrix()
-    }
-}
 
 abstract class MailOption
-{
+:
     def modify(mes:Message): Unit =
-    {
-        if (mes.msg contains tag)
-        {
+        if mes.msg `contains` tag then
             change(mes)
             mes.msg = mes.msg.replace(tag, "")
-        }
-    }
 
     def change(mes:Message): Unit 
 
     def tag:String
-}
 
 object Replace extends MailOption
-{
+:
     override def tag = "/#f"
 
     override def change(mes: Message): Unit =
-    {
-        for (m <- Messenger.messages.clone()) if (m.location == mes.location)
-        {
+        for m <- Messenger.messages.clone() do if m.location == mes.location then
             Messenger.messages -= m
             return
-        }
-    }
-}
 
 object Combine extends MailOption
-{
+:
     override def tag = "/#c"
 
     override def change(mes: Message): Unit =
-    {
-        for (m <- Messenger.messages.clone()) if (m.location == mes.location)
-        {
+        for m <- Messenger.messages.clone() do if m.location == mes.location then
             Messenger.messages -= m
             mes.msg = m.msg+"\n"+mes.msg
             return
-        }
-    }
-}
 
 class Message
-{
+:
     def set(location:BlockPos, x: Double, y: Double, z: Double, msg: String) =
-    {
         this.receivedOn = System.currentTimeMillis
         this.msg = msg
         this.location = location
@@ -190,13 +165,10 @@ class Message
         this.y = y
         this.z = z
         this
-    }
 
     def addY(y: Float) =
-    {
         yOffset += y
         this
-    }
 
     var location:BlockPos = null
     var x = 0.0D
@@ -205,4 +177,3 @@ class Message
     var msg:String = null
     var receivedOn = 0L
     var yOffset = 0F
-}

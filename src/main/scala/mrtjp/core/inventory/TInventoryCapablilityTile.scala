@@ -8,19 +8,14 @@ import net.minecraftforge.items.CapabilityItemHandler._
 import net.minecraftforge.items.wrapper.{InvWrapper => MCFInvWrapper, SidedInvWrapper}
 
 trait TInventoryCapablilityTile extends TileEntity with IInventory
-{
-    override def hasCapability(capability:Capability[_], facing:EnumFacing) =
+:
+    override def hasCapability(capability:Capability[?], facing:EnumFacing) =
         capability == ITEM_HANDLER_CAPABILITY || super.hasCapability(capability, facing)
 
     override def getCapability[T](capability:Capability[T], facing:EnumFacing):T =
-    {
-        if (capability == ITEM_HANDLER_CAPABILITY) {
-            if (this.isInstanceOf[ISidedInventory] && facing != null) {
+        if capability == ITEM_HANDLER_CAPABILITY then
+            if this.isInstanceOf[ISidedInventory] && facing != null then
                 return ITEM_HANDLER_CAPABILITY.cast(new SidedInvWrapper(this.asInstanceOf[ISidedInventory], facing))
-            } else {
+            else
                 return ITEM_HANDLER_CAPABILITY.cast(new MCFInvWrapper(this))
-            }
-        }
         super.getCapability(capability, facing)
-    }
-}
