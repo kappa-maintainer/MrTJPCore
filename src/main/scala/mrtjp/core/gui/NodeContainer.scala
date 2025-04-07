@@ -14,8 +14,8 @@ import net.minecraft.inventory._
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
-import scala.collection.JavaConversions._
 import scala.collection.mutable.{Buffer => MBuffer}
+import scala.collection.JavaConverters._
 
 class NodeContainer extends Container
 {
@@ -23,7 +23,7 @@ class NodeContainer extends Container
     var stopWatchDelegate = {(p:EntityPlayer) => }
     var slotChangeDelegate = {(slot:Int) => }
 
-    def slots:MBuffer[TSlot3] = asScalaBuffer[TSlot3](inventorySlots.asInstanceOf[JList[TSlot3]])
+    def slots:MBuffer[TSlot3] = inventorySlots.asInstanceOf[JList[TSlot3]].asScala
 
     override def canInteractWith(player:EntityPlayer) = true
 

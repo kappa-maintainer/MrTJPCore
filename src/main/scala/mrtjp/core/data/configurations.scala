@@ -19,7 +19,7 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.{FMLCommonHandler, Loader}
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 abstract class ModConfig(modID:String)
 {
@@ -114,13 +114,13 @@ abstract class ModConfig(modID:String)
 object SpecialConfigGui
 {
     def buildCategories(config:Configuration):JAList[IConfigElement] =
-        new JAList[IConfigElement](config.getCategoryNames.map(s =>
+        new JAList[IConfigElement](config.getCategoryNames.asScala.map(s =>
         {
             new DummyCategoryElement(s, "", new ConfigElement(config.getCategory(s)).getChildElements)
             {
                 override def getComment = config.getCategory(s).getComment
             }
-        }))
+        }).asJava)
 }
 
 class SpecialConfigGui(parent:GuiScreen, modid:String, config:Configuration) extends GuiConfig(parent, SpecialConfigGui.buildCategories(config), modid, false, false, GuiConfig.getAbridgedConfigPath(config.toString))

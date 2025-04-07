@@ -14,6 +14,7 @@ import net.minecraft.init.SoundEvents
 
 import scala.collection.convert.WrapAsJava
 import scala.collection.mutable.ListBuffer
+import scala.collection.JavaConverters._
 
 /**
  * Base button class with position and width/height. Doesnt render anything, nor does it perform
@@ -64,7 +65,7 @@ class ButtonNode extends TNode
             //draw tooltip with absolute coords to allow it to force-fit on screen
             translateToScreen()
             val Point(mx, my) = parent.convertPointToScreen(mouse)
-            GuiDraw.drawMultiLineTip(mx+12, my-12, WrapAsJava.seqAsJavaList(list))
+            GuiDraw.drawMultiLineTip(mx+12, my-12, list.asJava)
             translateFromScreen()
         }
     }

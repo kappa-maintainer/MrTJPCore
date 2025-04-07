@@ -9,6 +9,7 @@ import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 
 import scala.collection.immutable.HashMap
+import scala.IterableOnce
 
 object ItemKey
 {
@@ -116,7 +117,7 @@ class ItemQueue
         this
     }
 
-    def ++=(xs:TraversableOnce[(ItemKey, Int)]) = {xs foreach +=; this}
+    def ++=(xs:IterableOnceIterableOnce[(ItemKey, Int)]) = {xs foreach +=; this}
 
     def ++=(that:ItemQueue) = {that.result.foreach(+=); this}
 
@@ -132,7 +133,7 @@ class ItemQueue
         else collection -= elem._1
     }
 
-    def --=(xs:TraversableOnce[(ItemKey, Int)]) = {xs foreach -=; this}
+    def --=(xs:IterableOnceIterableOnce[(ItemKey, Int)]) = {xs foreach -=; this}
 
     def --=(that:ItemQueue) = {that.result.foreach(-=); this}
 

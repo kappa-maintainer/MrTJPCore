@@ -9,6 +9,7 @@ import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.BitSet
 import scala.collection.mutable.{BitSet => MBitSet, Builder => MBuilder}
 import scala.collection.{SortedSetLike, immutable}
+import scala.IterableOnce
 
 trait Enum
 {
@@ -54,7 +55,7 @@ trait Enum
         override def hashCode = 31*(this.getClass.## +name.## +ordinal)
 
         def +(v:EnumVal) = ValSet(getThis, v)
-        def ++(xs:TraversableOnce[EnumVal]) = (ValSet.newBuilder ++= xs).result()
+        def ++(xs:IterableOnceIterableOnce[EnumVal]) = (ValSet.newBuilder ++= xs).result()
 
         def until(v:EnumVal) = build(ordinal until v.ordinal)
         def to(v:EnumVal) = build(ordinal to v.ordinal)

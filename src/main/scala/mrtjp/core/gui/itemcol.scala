@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper}
 import net.minecraft.client.util.ITooltipFlag.TooltipFlags._
 import net.minecraft.item.ItemStack
 import net.minecraft.util.text.TextFormatting
+import scala.collection.JavaConverters._
 
 class ItemListNode extends TNode
 {
@@ -106,11 +107,10 @@ class ItemDisplayNode extends TNode
         translateToScreen()
         val Point(mx, my) = parent.convertPointToScreen(mouse)
 
-        import scala.collection.JavaConversions._
         val lines = stack.makeStack.getTooltip(mcInst.player,
             if(mcInst.gameSettings.advancedItemTooltips) ADVANCED else NORMAL)
-        val l2 = Seq(lines.head)++lines.tail.map(TextFormatting.GRAY + _)
-        GuiDraw.drawMultiLineTip(mx+12, my-12, l2)
+        val l2 = Seq(lines.asScala.head)++lines.asScala.tail.map(TextFormatting.GRAY + _)
+        GuiDraw.drawMultiLineTip(mx+12, my-12, l2.asJava)
 
         translateFromScreen()
         ClipNode.tempEnableScissoring()

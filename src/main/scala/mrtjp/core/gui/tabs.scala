@@ -14,8 +14,8 @@ import net.minecraft.client.renderer.{GlStateManager, RenderHelper}
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.item.ItemStack
 
-import scala.collection.JavaConversions
 import scala.collection.mutable.ListBuffer
+import scala.collection.JavaConverters._
 
 /**
   * Represents an expandable tab that sits on the right edge of a GUI window. Expands when clicked on.
@@ -71,7 +71,7 @@ class TabNode(wMin:Int, hMin:Int, wMax:Int, hMax:Int, val color:Int) extends TNo
         {
             val list = ListBuffer[String]()
             buildToolTip(list)
-            GuiDraw.drawMultiLineTip(mouse.x+12, mouse.y-12, JavaConversions.bufferAsJavaList(list))
+            GuiDraw.drawMultiLineTip(mouse.x+12, mouse.y-12, list.asJava)
         }
     }
 

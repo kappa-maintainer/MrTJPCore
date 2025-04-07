@@ -32,8 +32,8 @@ import net.minecraft.world.{Explosion, IBlockAccess, World}
 import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
-import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
+import scala.collection.JavaConverters._
 
 object MultiTileBlock
 {
@@ -172,7 +172,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
             case t:MTBlockTile => t.addHarvestContents(list)
             case _ =>
         }
-        new JArrayList[ItemStack](list)
+        new JArrayList[ItemStack](list.asJava)
     }
 
     override def getPickBlock(state:IBlockState, target:RayTraceResult, world:World, pos:BlockPos, player:EntityPlayer) =
