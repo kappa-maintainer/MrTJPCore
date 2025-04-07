@@ -8,7 +8,7 @@ package mrtjp.core.gui
 import mrtjp.core.vec.{Point, Rect, Size}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.{FontRenderer, Gui}
-import net.minecraft.client.renderer.GlStateManager._
+import net.minecraft.client.renderer.GlStateManager.*
 import net.minecraft.client.renderer.texture.TextureManager
 
 /**

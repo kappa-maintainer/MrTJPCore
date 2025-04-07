@@ -13,13 +13,13 @@ import net.minecraft.block.SoundType
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util._
+import net.minecraft.util.*
 import net.minecraft.world.World
 import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
-import java.util.{List => JList}
+import java.util.{List as JList}
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 class ItemCore extends Item
 :

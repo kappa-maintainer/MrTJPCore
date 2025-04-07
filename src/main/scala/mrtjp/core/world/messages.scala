@@ -8,7 +8,7 @@ package mrtjp.core.world
 import codechicken.lib.packet.PacketCustom
 import mrtjp.core.handler.MrTJPCoreSPH
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager._
+import net.minecraft.client.renderer.GlStateManager.*
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.math.BlockPos

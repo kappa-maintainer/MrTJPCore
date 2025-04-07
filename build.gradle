@@ -162,7 +162,8 @@ tasks.withType(ScalaCompile).configureEach {
     //scalaCompileOptions.additionalParameters = ['-indent', '-rewrite']
     //scalaCompileOptions.additionalParameters = ['-source','3.4-migration', '-rewrite']
     //scalaCompileOptions.additionalParameters = ['-source','3.5-migration', '-rewrite']
-    scalaCompileOptions.additionalParameters = ['-source','3.6-migration', '-rewrite']
+    //scalaCompileOptions.additionalParameters = ['-source','3.6-migration', '-rewrite']
+    //scalaCompileOptions.additionalParameters = ['-source','future-migration', '-rewrite']
 }
 
 

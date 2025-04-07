@@ -5,7 +5,7 @@
  */
 package mrtjp.core.block
 
-import java.util.{Random, ArrayList => JArrayList, List => JList}
+import java.util.{Random, ArrayList as JArrayList, List as JList}
 
 import codechicken.lib.data.{MCDataInput, MCDataOutput}
 import codechicken.lib.packet.{ICustomPacketTile, PacketCustom}
@@ -26,14 +26,14 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util._
+import net.minecraft.util.*
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos, RayTraceResult}
 import net.minecraft.world.{Explosion, IBlockAccess, World}
 import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.mutable.ListBuffer
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 object MultiTileBlock
 :
@@ -41,7 +41,7 @@ object MultiTileBlock
 
 class MultiTileBlock(mat:Material) extends Block(mat)
 :
-    import MultiTileBlock._
+    import MultiTileBlock.*
 
     private val tiles = new Array[Class[? <: MTBlockTile]](16)
 

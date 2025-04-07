@@ -7,7 +7,7 @@ package mrtjp.core.fx
 
 import mrtjp.core.fx.particles.CoreParticle
 
-import scala.collection.mutable.{Seq => MSeq}
+import scala.collection.mutable.{Seq as MSeq}
 
 class SequenceAction extends ParticleAction
 {

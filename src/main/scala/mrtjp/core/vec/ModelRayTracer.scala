@@ -21,7 +21,7 @@ object ModelRayTracer
         val dir = to.copy.subtract(from)
 
         def getSide(vec:Vector3) =
-            import vec.{x => x1, y => y1, z => z1}
+            import vec.{x as x1, y as y1, z as z1}
             Seq((-y1, 0), (y1, 1), (-z1, 2), (z1, 3), (-x1, 4), (x1, 5)).maxBy(_._1)._2
 
         raytraceModel(start, dir, model) match

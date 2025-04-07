@@ -4,8 +4,8 @@ import net.minecraft.inventory.{IInventory, ISidedInventory}
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.items.CapabilityItemHandler._
-import net.minecraftforge.items.wrapper.{InvWrapper => MCFInvWrapper, SidedInvWrapper}
+import net.minecraftforge.items.CapabilityItemHandler.*
+import net.minecraftforge.items.wrapper.{InvWrapper as MCFInvWrapper, SidedInvWrapper}
 
 trait TInventoryCapablilityTile extends TileEntity with IInventory
 :

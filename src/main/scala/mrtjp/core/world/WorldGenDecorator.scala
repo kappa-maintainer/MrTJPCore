@@ -43,7 +43,7 @@ class WorldGenDecorator extends TWorldGenerator
                 val state = b.getStateFromMeta(m)
                 val h = if stackHeight > 1 then rand.nextInt(stackHeight) else 0
 
-                import scala.util.control.Breaks._
+                import scala.util.control.Breaks.*
                 breakable(for s <- 0 to h do
                 {
                     if !checkStay then generated |= w.setBlockState(new BlockPos(x, y, z), state, 2)

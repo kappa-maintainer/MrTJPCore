@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.SoundEvents
 
 import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 /**
  * Base button class with position and width/height. Doesnt render anything, nor does it perform

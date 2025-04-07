@@ -6,7 +6,7 @@
 package mrtjp.core.data
 
 import java.io.File
-import java.util.{ArrayList => JAList}
+import java.util.{ArrayList as JAList}
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -19,7 +19,7 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.{FMLCommonHandler, Loader}
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 abstract class ModConfig(modID:String)
 :
@@ -37,7 +37,7 @@ abstract class ModConfig(modID:String)
             put(key, value, comment, false)
 
         def put[T](key:String, value:T, comment:String, force:Boolean):T =
-            import net.minecraftforge.common.config.Property.Type._
+            import net.minecraftforge.common.config.Property.Type.*
             def getType(value:Any):Property.Type = value match
                 case xs:Array[_] => getType(xs.head)
                 case b:Boolean   => BOOLEAN

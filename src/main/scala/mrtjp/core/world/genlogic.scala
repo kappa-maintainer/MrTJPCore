@@ -15,7 +15,7 @@ import net.minecraft.world.gen.feature.WorldGenerator
 import net.minecraft.world.{World, WorldType}
 import net.minecraftforge.common.BiomeDictionary
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 trait TGenerationLogic extends ISimpleStructureGen
 :

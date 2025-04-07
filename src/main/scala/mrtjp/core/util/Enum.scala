@@ -7,7 +7,7 @@ package mrtjp.core.util
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.BitSet
-import scala.collection.mutable.{BitSet => MBitSet, Builder => MBuilder}
+import scala.collection.mutable.{BitSet as MBitSet, Builder as MBuilder}
 import scala.collection.{BuildFrom, IterableOnce, SortedSet, immutable}
 
 trait Enum

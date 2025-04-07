@@ -5,17 +5,17 @@
  */
 package mrtjp.core.gui
 
-import java.util.{List => JList}
+import java.util.{List as JList}
 
 import mrtjp.core.inventory.InvWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.inventory._
+import net.minecraft.inventory.*
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
-import scala.collection.mutable.{Buffer => MBuffer}
-import scala.collection.JavaConverters._
+import scala.collection.mutable.{Buffer as MBuffer}
+import scala.collection.JavaConverters.*
 
 class NodeContainer extends Container
 :
@@ -194,7 +194,7 @@ class NodeContainer extends Container
         if stack.getCount > 0 then
             var k = if reverse then end-1 else start
 
-            import scala.util.control.Breaks._
+            import scala.util.control.Breaks.*
             breakable
               :
                 while !reverse && k < end || reverse && k >= start do

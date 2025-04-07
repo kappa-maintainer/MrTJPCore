@@ -5,7 +5,7 @@
  */
 package mrtjp.core.gui
 
-import java.util.{List => JList}
+import java.util.{List as JList}
 
 import codechicken.lib.colour.EnumColour
 import codechicken.lib.gui.GuiDraw
@@ -14,8 +14,8 @@ import mrtjp.core.item.ItemKeyStack
 import mrtjp.core.vec.{Point, Rect, Size}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
-import net.minecraft.client.renderer.GlStateManager._
-import net.minecraft.client.util.ITooltipFlag.TooltipFlags._
+import net.minecraft.client.renderer.GlStateManager.*
+import net.minecraft.client.util.ITooltipFlag.TooltipFlags.*
 import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper}
 import net.minecraft.item.ItemStack
 

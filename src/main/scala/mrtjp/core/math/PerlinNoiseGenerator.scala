@@ -58,7 +58,7 @@ class PerlinNoiseGenerator(rand:Random)
         var y1 = y+offsetY
         var z1 = z+offsetZ
 
-        import PerlinNoiseGenerator._
+        import PerlinNoiseGenerator.*
 
         val floorX = floor(x1)
         val floorY = floor(y1)

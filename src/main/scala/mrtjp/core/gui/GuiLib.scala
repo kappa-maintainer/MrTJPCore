@@ -8,7 +8,7 @@ package mrtjp.core.gui
 import codechicken.lib.gui.GuiDraw
 import codechicken.lib.render.CCRenderState
 import codechicken.lib.texture.TextureUtils
-import net.minecraft.client.renderer.GlStateManager._
+import net.minecraft.client.renderer.GlStateManager.*
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11

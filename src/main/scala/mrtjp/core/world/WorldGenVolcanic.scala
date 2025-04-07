@@ -14,7 +14,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
-import scala.collection.mutable.{HashMap => MHashMap, Queue => MQueue}
+import scala.collection.mutable.{HashMap as MHashMap, Queue as MQueue}
 
 class WorldGenVolcanic extends TWorldGenerator
 :

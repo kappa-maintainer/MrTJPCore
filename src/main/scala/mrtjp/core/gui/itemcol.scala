@@ -5,19 +5,19 @@
  */
 package mrtjp.core.gui
 
-import java.util.{List => JList}
+import java.util.{List as JList}
 
 import codechicken.lib.gui.GuiDraw
 import codechicken.lib.vec.{Scale, Vector3}
 import mrtjp.core.item.ItemKeyStack
 import mrtjp.core.vec.{Point, Rect, Size}
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager._
+import net.minecraft.client.renderer.GlStateManager.*
 import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper}
-import net.minecraft.client.util.ITooltipFlag.TooltipFlags._
+import net.minecraft.client.util.ITooltipFlag.TooltipFlags.*
 import net.minecraft.item.ItemStack
 import net.minecraft.util.text.TextFormatting
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 class ItemListNode extends TNode
 :

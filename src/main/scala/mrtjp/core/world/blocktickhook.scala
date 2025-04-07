@@ -5,14 +5,14 @@
  */
 package mrtjp.core.world
 
-import java.util.{Random, HashSet => JHSet, Set => JSet}
+import java.util.{Random, HashSet as JHSet, Set as JSet}
 
 import codechicken.lib.math.MathHelper
 import codechicken.lib.util.ServerUtils
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.math.{BlockPos, ChunkPos}
-import net.minecraft.world._
+import net.minecraft.world.*
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.{Phase, WorldTickEvent}

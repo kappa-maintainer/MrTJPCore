@@ -11,7 +11,7 @@ import codechicken.lib.vec.Vector3
 import mrtjp.core.fx.{TAlphaParticle, TColourParticle, TTextureParticle}
 import net.minecraft.client.particle.Particle
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.client.renderer.GlStateManager._
+import net.minecraft.client.renderer.GlStateManager.*
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
 import net.minecraft.world.World

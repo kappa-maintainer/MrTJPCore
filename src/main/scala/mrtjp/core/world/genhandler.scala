@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.{Phase, WorldTickEvent}
 import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraftforge.fml.relauncher.Side
 
-import scala.collection.mutable.{Queue => MQueue}
+import scala.collection.mutable.{Queue as MQueue}
 
 trait ISimpleStructureGen
 :

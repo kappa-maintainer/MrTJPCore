@@ -7,10 +7,10 @@ package mrtjp.core.fx.particles
 
 import codechicken.lib.render.CCRenderState
 import codechicken.lib.texture.TextureUtils
-import mrtjp.core.fx._
+import mrtjp.core.fx.*
 import net.minecraft.client.particle.Particle
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.client.renderer.GlStateManager._
+import net.minecraft.client.renderer.GlStateManager.*
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
 import net.minecraft.world.World

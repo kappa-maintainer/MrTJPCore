@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.{EnumFacing, ITickable}
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world._
+import net.minecraft.world.*
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage
 import net.minecraftforge.common.IPlantable
 import net.minecraftforge.oredict.OreDictionary
@@ -113,7 +113,7 @@ object WorldLib
                     state.getBlock.canBeReplacedByLeaves(state, world, pos)
 
     def isAssociatedTreeBlock(world:World, pos:BlockPos, state:IBlockState) =
-        import net.minecraft.init.Blocks._
+        import net.minecraft.init.Blocks.*
         Seq(LOG, LOG2, LEAVES, LEAVES2, VINE, COCOA).contains(state.getBlock) || isLeafType(world, pos, state) || isWoodType(world, pos, state)
 
     def findSurfaceHeight(world:World, pos:BlockPos) =

@@ -7,10 +7,10 @@ package mrtjp.core.vec
 
 import codechicken.lib.raytracer.IndexedCuboid6
 import codechicken.lib.render.{CCModel, OBJParser}
-import codechicken.lib.vec._
+import codechicken.lib.vec.*
 import net.minecraft.util.ResourceLocation
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 object VecLib
 :
