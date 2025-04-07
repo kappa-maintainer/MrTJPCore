@@ -23,12 +23,12 @@ object KeyTracking
     private var idPool = 0
     private val map = MHashMap[Int, MMap[EntityPlayer, Boolean]]()
 
-    def updatePlayerKey(id:Int, player:EntityPlayer, state:Boolean)
+    def updatePlayerKey(id:Int, player:EntityPlayer, state:Boolean): Unit =
     {
         map(id) += player -> state
     }
 
-    def registerTracker(tracker:TServerKeyTracker)
+    def registerTracker(tracker:TServerKeyTracker): Unit =
     {
         tracker.id = idPool
         idPool += 1
@@ -45,7 +45,7 @@ trait TServerKeyTracker
 
     def isKeyDown(p:EntityPlayer) = KeyTracking.isKeyDown(id, p)
 
-    def register()
+    def register(): Unit =
     {
         KeyTracking.registerTracker(this)
     }
@@ -61,7 +61,7 @@ trait TClientKeyTracker
 
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    def tick(event:ClientTickEvent)
+    def tick(event:ClientTickEvent): Unit =
     {
         val down = getIsKeyDown
         if (down != wasDown) {
@@ -77,7 +77,7 @@ trait TClientKeyTracker
     }
 
     @SideOnly(Side.CLIENT)
-    def register()
+    def register(): Unit =
     {
         MinecraftForge.EVENT_BUS.register(this)
         this match {

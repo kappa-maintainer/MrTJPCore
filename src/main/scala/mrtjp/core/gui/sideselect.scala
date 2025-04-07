@@ -60,7 +60,7 @@ class SideSelectNode(x:Int, y:Int, w:Int, h:Int) extends TNode
       * Called by child button nodes when they are pressed.
       * @param side The EnumFacing index of the side that the pressed button represents.
       */
-    def onSidePresed(side:Int)
+    def onSidePresed(side:Int): Unit =
     {
         val old = sides
         sides ^= 1<<side
@@ -77,5 +77,5 @@ class SideSelectNode(x:Int, y:Int, w:Int, h:Int) extends TNode
       * @param oldside The old side mask.
       * @todo Make this a delegate function instead of override point.
       */
-    def onSideChanged(oldside:Int){}
+    def onSideChanged(oldside:Int): Unit ={}
 }

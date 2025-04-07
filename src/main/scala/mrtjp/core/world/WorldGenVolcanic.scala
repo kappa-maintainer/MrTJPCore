@@ -102,7 +102,7 @@ class WorldGenVolcanic extends TWorldGenerator
         true
     }
 
-    private def purgeArea(w:World, x:Int, y:Int, z:Int)
+    private def purgeArea(w:World, x:Int, y:Int, z:Int): Unit =
     {
         if (w.isAirBlock(new BlockPos(x, y, z))) return
         for (i <- -1 to 1) for (j <- -1 to 1)
@@ -115,7 +115,7 @@ class WorldGenVolcanic extends TWorldGenerator
         purgeArea(w, x, y+1, z)
     }
 
-    private def enqueueBlocks(x:Int, y:Int, z:Int, p:Int, rand:Random)
+    private def enqueueBlocks(x:Int, y:Int, z:Int, p:Int, rand:Random): Unit =
     {
         val seed = rand.nextInt(16)
         enq(x-1, y, z, if ((seed&1) != 0) p-1 else p)
@@ -123,7 +123,7 @@ class WorldGenVolcanic extends TWorldGenerator
         enq(x, y, z-1, if ((seed&4) != 0) p-1 else p)
         enq(x, y, z+1, if ((seed&8) != 0) p-1 else p)
 
-        def enq(x:Int, y:Int, z:Int, p:Int)
+        def enq(x:Int, y:Int, z:Int, p:Int): Unit =
         {
             if (p > 0)
             {

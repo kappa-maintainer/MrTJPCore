@@ -70,7 +70,7 @@ class SimpleTextboxNode(x:Int, y:Int, w:Int, h:Int, tq:String) extends TNode
       * @param t The text to set.
       * @todo Make this private. Externally, [[text]] should be set directly.
       */
-    def setText(t:String)
+    def setText(t:String): Unit =
     {
         val old = text
         text = t
@@ -80,7 +80,7 @@ class SimpleTextboxNode(x:Int, y:Int, w:Int, h:Int, tq:String) extends TNode
     /**
       * Sets the [[focused]] property of this text box.
       */
-    def setFocused(flag:Boolean)
+    def setFocused(flag:Boolean): Unit =
     {
         if (focused != flag)
         {
@@ -90,7 +90,7 @@ class SimpleTextboxNode(x:Int, y:Int, w:Int, h:Int, tq:String) extends TNode
         }
     }
 
-    override def update_Impl(){cursorCounter += 1}
+    override def update_Impl(): Unit ={cursorCounter += 1}
 
     override def keyPressed_Impl(c:Char, keycode:Int, consumed:Boolean):Boolean =
     {
@@ -161,7 +161,7 @@ class SimpleTextboxNode(x:Int, y:Int, w:Int, h:Int, tq:String) extends TNode
         }
     }
 
-    override def drawBack_Impl(mouse:Point, rframe:Float)
+    override def drawBack_Impl(mouse:Point, rframe:Float): Unit =
     {
         GuiDraw.drawRect(position.x-1, position.y-1, size.width+1, size.height+1, 0xFFA0A0A0) //todo make these colors configurable properties
         GuiDraw.drawRect(position.x, position.y, size.width, size.height, 0xFF000000)

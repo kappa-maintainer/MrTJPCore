@@ -35,7 +35,7 @@ base {
 }
 
 scala {
-    scalaVersion = '2.13.16'
+    scalaVersion = '3.6.4'
 }
 
 java {
@@ -157,7 +157,7 @@ tasks.remapJar {
 }
 
 tasks.withType(ScalaCompile).configureEach {
-    //scalaCompileOptions.additionalParameters = ['-target:jvm-1.8', '-P:semanticdb:synthetics:on']
+    scalaCompileOptions.additionalParameters = ['-source:3.0-migration', '-rewrite']
 }
 
 

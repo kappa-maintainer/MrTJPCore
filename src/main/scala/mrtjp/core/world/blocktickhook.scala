@@ -25,7 +25,7 @@ object BlockUpdateHandler
     private var registered = false
     private var chunkSet = new JHSet[ChunkPos]()
 
-    def register(handler:IBlockEventHandler)
+    def register(handler:IBlockEventHandler): Unit =
     {
         if (!registered)
         {
@@ -66,7 +66,7 @@ object BlockUpdateHandler
     }
 
     @SubscribeEvent
-    def onTick(event:WorldTickEvent)
+    def onTick(event:WorldTickEvent): Unit =
     {
         if (event.side != Side.SERVER || event.phase != Phase.END) return
 
@@ -114,5 +114,5 @@ object BlockUpdateHandler
 
 trait IBlockEventHandler
 {
-    def onBlockUpdate(w:World, p:BlockPos, b:IBlockState)
+    def onBlockUpdate(w:World, p:BlockPos, b:IBlockState): Unit 
 }

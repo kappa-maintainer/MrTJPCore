@@ -26,7 +26,7 @@ object WorldLib
 //        if (!clazz.isInstance(tile)) null.asInstanceOf[T] else tile.asInstanceOf[T]
 //    }
 
-    def bulkBlockUpdate(world:World, pos:BlockPos, bl:Block)
+    def bulkBlockUpdate(world:World, pos:BlockPos, bl:Block): Unit =
     {
         for (a <- -3 to 3) for (b <- -3 to 3) for (c <- -3 to 3)
         {
@@ -39,7 +39,7 @@ object WorldLib
         }
     }
 
-    def dropItem(world:World, pos:BlockPos, stack:ItemStack)
+    def dropItem(world:World, pos:BlockPos, stack:ItemStack): Unit =
     {
         if (!world.isRemote && world.getGameRules.getBoolean("doTileDrops"))
         {
@@ -53,7 +53,7 @@ object WorldLib
         }
     }
 
-    def centerEject(w:World, pos:BlockPos, stack:ItemStack, dir:Int, vel:Double)
+    def centerEject(w:World, pos:BlockPos, stack:ItemStack, dir:Int, vel:Double): Unit =
     {
         val pos2 = pos.offset(EnumFacing.values()(dir))
         val item = new EntityItem(w, pos2.getX+0.5D, pos2.getY+0.5D, pos2.getZ+0.5D, stack)
@@ -72,7 +72,7 @@ object WorldLib
         w.spawnEntity(item)
     }
 
-    def uncheckedSetBlock(world:World, pos:BlockPos, state:IBlockState)
+    def uncheckedSetBlock(world:World, pos:BlockPos, state:IBlockState): Unit =
     {
         val ch = world.getChunk(pos)
         val arr = ch.getBlockStorageArray
@@ -88,19 +88,19 @@ object WorldLib
         world.notifyBlockUpdate(pos, oldState, state, 3)
     }
 
-    def uncheckedRemoveTileEntity(world:World, pos:BlockPos)
+    def uncheckedRemoveTileEntity(world:World, pos:BlockPos): Unit =
     {
         val ch = world.getChunk(pos)
         if (ch != null) {
             val te = ch.getTileEntityMap.remove(pos)
             if (te != null) {
-                world.loadedTileEntityList.removeIf {t:TileEntity => t.getPos == pos }
-                world.tickableTileEntities.removeIf {t:TileEntity => t.getPos == pos }
+                world.loadedTileEntityList.removeIf {(t:TileEntity) => t.getPos == pos }
+                world.tickableTileEntities.removeIf {(t:TileEntity) => t.getPos == pos }
             }
         }
     }
 
-    def uncheckedSetTileEntity(world:World, pos:BlockPos, tile:TileEntity)
+    def uncheckedSetTileEntity(world:World, pos:BlockPos, tile:TileEntity): Unit =
     {
         val ch = world.getChunk(pos)
         if (ch != null) {
@@ -149,7 +149,7 @@ object WorldLib
     def findSurfaceHeight(world:World, pos:BlockPos) =
     {
         var pos2 = world.getHeight(pos).up()
-        do pos2 = pos2.down() while (pos2.getY >= 0 && {val b = world.getBlockState(pos2); isBlockSoft(world, pos2, b) || isAssociatedTreeBlock(world, pos2, b)})
+        while ({ pos2 = pos2.down() ; pos2.getY >= 0 && {val b = world.getBlockState(pos2); isBlockSoft(world, pos2, b) || isAssociatedTreeBlock(world, pos2, b)}}) ()
         pos2
     }
 

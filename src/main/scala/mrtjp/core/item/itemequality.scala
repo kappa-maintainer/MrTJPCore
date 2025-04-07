@@ -22,7 +22,7 @@ class ItemEquality
         c
     }
 
-    def setFlags(meta:Boolean, nbt:Boolean, ore:Boolean, group:Int)
+    def setFlags(meta:Boolean, nbt:Boolean, ore:Boolean, group:Int): Unit =
     {
         matchMeta = meta
         matchNBT = nbt

@@ -28,12 +28,12 @@ trait TInventory extends IInventory
     override def isUsableByPlayer(player:EntityPlayer) = true
     override def isItemValidForSlot(slot:Int, item:ItemStack) = true
 
-    override def openInventory(player:EntityPlayer){}
-    override def closeInventory(player:EntityPlayer){}
+    override def openInventory(player:EntityPlayer): Unit ={}
+    override def closeInventory(player:EntityPlayer): Unit ={}
 
     override def getStackInSlot(slot:Int) = storage(slot)
 
-    override def setInventorySlotContents(slot:Int, item:ItemStack)
+    override def setInventorySlotContents(slot:Int, item:ItemStack): Unit =
     {
         storage(slot) = item
         markDirty()
@@ -69,7 +69,7 @@ trait TInventory extends IInventory
         }
     }
 
-    override def clear()
+    override def clear(): Unit =
     {
         for (i <- storage.indices)
             storage(i) = ItemStack.EMPTY
@@ -77,10 +77,10 @@ trait TInventory extends IInventory
 
     override def getFieldCount = 0
     override def getField(id:Int) = 0
-    override def setField(id:Int, value:Int){}
+    override def setField(id:Int, value:Int): Unit ={}
 
-    def loadInv(tag:NBTTagCompound){ loadInv(tag, getName) }
-    def loadInv(tag:NBTTagCompound, prefix:String)
+    def loadInv(tag:NBTTagCompound): Unit ={ loadInv(tag, getName) }
+    def loadInv(tag:NBTTagCompound, prefix:String): Unit =
     {
         val tag1 = tag.getTagList(prefix+"items", 10)
         for (i <- 0 until tag1.tagCount())
@@ -93,8 +93,8 @@ trait TInventory extends IInventory
         }
     }
 
-    def saveInv(tag:NBTTagCompound){ saveInv(tag, getName) }
-    def saveInv(tag:NBTTagCompound, prefix:String)
+    def saveInv(tag:NBTTagCompound): Unit ={ saveInv(tag, getName) }
+    def saveInv(tag:NBTTagCompound, prefix:String): Unit =
     {
         val itemList = new NBTTagList
         for (i <- storage.indices) if (!storage(i).isEmpty && storage(i).getCount > 0)
@@ -109,7 +109,7 @@ trait TInventory extends IInventory
         tag.setInteger(prefix+"itemsCount", storage.length)
     }
 
-    def dropInvContents(w:World, pos:BlockPos)
+    def dropInvContents(w:World, pos:BlockPos): Unit =
     {
         for (i <- storage) if (!i.isEmpty) WorldLib.dropItem(w, pos, i)
         for (i <- storage.indices) storage(i) = ItemStack.EMPTY

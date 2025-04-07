@@ -19,7 +19,7 @@ object InvWrapper
 {
     var wrappers = Seq[IInvWrapperRegister]()
 
-    def register(w:IInvWrapperRegister)
+    def register(w:IInvWrapperRegister): Unit =
     {
         for (wr <- wrappers) if (wr.wrapperID == w.wrapperID) return
         wrappers :+= w
@@ -154,7 +154,7 @@ abstract class InvWrapper
         this
     }
 
-    def setMatchOptions(other:ItemEquality)
+    def setMatchOptions(other:ItemEquality): Unit =
     {
         setMatchOptions(other.matchMeta, other.matchNBT, other.matchOre)
         setDamageGroup(other.damageGroup)

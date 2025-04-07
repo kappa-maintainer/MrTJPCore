@@ -64,19 +64,19 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
         this
     }
 
-    def pageUp()
+    def pageUp(): Unit =
     {
         currentPage += 1
         if (currentPage > pagesNeeded) currentPage = pagesNeeded
     }
 
-    def pageDown()
+    def pageDown(): Unit =
     {
         currentPage -= 1
         if (currentPage < 0) currentPage = 0
     }
 
-    def resetDownloadStats()
+    def resetDownloadStats(): Unit =
     {
         waitingForList = true
         downloadFinished = false
@@ -101,7 +101,7 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
         count
     }
 
-    override def drawBack_Impl(mouse:Point, frame:Float)
+    override def drawBack_Impl(mouse:Point, frame:Float): Unit =
     {
         drawGradientRect(x, y, x+size.width, y+size.height, 0xff808080, 0xff808080)
         pagesNeeded = (getSeachedCount-1)/(rows*columns)
@@ -112,7 +112,7 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
         else drawAllItems(mouse.x, mouse.y)
     }
 
-    override def drawFront_Impl(mouse:Point, rframe:Float)
+    override def drawFront_Impl(mouse:Point, rframe:Float): Unit =
     {
         if (hover != null) GuiDraw.drawMultiLineTip(
             mouse.x+12, mouse.y-12,
@@ -133,7 +133,7 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
         else false
     }
 
-    private def drawLoadingScreen()
+    private def drawLoadingScreen(): Unit =
     {
         val barSizeX = size.width/2
         val time = System.currentTimeMillis/(if (waitingForList) 40 else 8)
@@ -150,7 +150,7 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
         Gui.drawRect(xStart, yStart, xStart+xSize, yStart+ySize, 0xff165571)
     }
 
-    private def drawAllItems(mx:Int, my:Int)
+    private def drawAllItems(mx:Int, my:Int): Unit =
     {
         hover = null
         selection = null
@@ -164,9 +164,9 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
 
         val b, c = new scala.util.control.Breaks
         b.breakable
-        {
+          {
             for (keystack <- displayList) c.breakable
-            {
+              {
                 if (!filterAllows(keystack)) c.break()
                 itemNumber += 1
                 if (itemNumber <= rows*columns*currentPage) c.break()
@@ -198,7 +198,7 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
         glItemPost()
     }
 
-    private def glItemPre()
+    private def glItemPre(): Unit =
     {
         pushMatrix()
         color(1.0F, 1.0F, 1.0F, 1.0F)
@@ -209,14 +209,14 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
         disableLighting()
     }
 
-    private def glItemPost()
+    private def glItemPost(): Unit =
     {
         enableDepth()
         popMatrix()
     }
 
     protected var renderItem = Minecraft.getMinecraft.getRenderItem
-    private def inscribeItemStack(xPos:Int, yPos:Int, stack:ItemStack)
+    private def inscribeItemStack(xPos:Int, yPos:Int, stack:ItemStack): Unit =
     {
         val font = stack.getItem.getFontRenderer(stack) match {
             case null => getFontRenderer

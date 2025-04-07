@@ -31,12 +31,12 @@ class BeamPulse2(w:World) extends CoreParticle(w) with TAlphaParticle with TColo
     override def py = prevPosY
     override def pz = prevPosZ
 
-    override def px_=(x:Double){prevPosX = x}
-    override def py_=(y:Double){prevPosY = y}
-    override def pz_=(z:Double){prevPosZ = z}
+    override def px_=(x:Double): Unit ={prevPosX = x}
+    override def py_=(y:Double): Unit ={prevPosY = y}
+    override def pz_=(z:Double): Unit ={prevPosZ = z}
 
     private var s:ParticleAction = null
-    def doPulse(r:Double, g:Double, b:Double)
+    def doPulse(r:Double, g:Double, b:Double): Unit =
     {
         import ParticleAction._
         removeAction(s)
@@ -47,7 +47,7 @@ class BeamPulse2(w:World) extends CoreParticle(w) with TAlphaParticle with TColo
         runAction(s)
     }
 
-    override def renderParticle(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float)
+    override def renderParticle(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float): Unit =
     {
         super.renderParticle(buffer, entity, frame, cosyaw, cospitch, sinyaw, sinsinpitch, cossinpitch)
 
@@ -126,7 +126,7 @@ class BeamPulse2(w:World) extends CoreParticle(w) with TAlphaParticle with TColo
         renderFlare(buffer, entity, frame, cosyaw, cospitch, sinyaw, sinsinpitch, cossinpitch)
     }
 
-    def renderFlare(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float)
+    def renderFlare(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float): Unit =
     {
         TextureUtils.changeTexture(flareTexture)
 

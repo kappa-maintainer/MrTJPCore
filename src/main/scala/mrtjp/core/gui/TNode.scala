@@ -107,7 +107,7 @@ trait TNode extends Gui
     def buildParentHierarchy(to:TNode) =
     {
         var hierarchy = Seq.newBuilder[TNode]
-        def iterate(node:TNode) {
+        def iterate(node:TNode): Unit = {
             hierarchy += node
             if (node.isRoot || node == to) return
             iterate(node.parent)
@@ -239,7 +239,7 @@ trait TNode extends Gui
     def subTree(activeOnly:Boolean = false) =
     {
         val s = Seq.newBuilder[TNode]
-        def gather(children:Seq[TNode]) {
+        def gather(children:Seq[TNode]): Unit = {
             val ac = if (activeOnly) children.filter(c => !c.hidden && c.userInteractionEnabled) else children
             s ++= ac
             for (c <- ac) gather(c.children)
@@ -254,7 +254,7 @@ trait TNode extends Gui
       *
       * @param z The new z-position for this node.
       */
-    def pushZTo(z:Double)
+    def pushZTo(z:Double): Unit =
     {
         pushZBy(z-zPosition)
     }
@@ -265,7 +265,7 @@ trait TNode extends Gui
       *
       * @param z The value to add to this node's z-position.
       */
-    def pushZBy(z:Double)
+    def pushZBy(z:Double): Unit =
     {
         for (c <- subTree():+this)
             c.zPosition += z
@@ -280,7 +280,7 @@ trait TNode extends Gui
     }
 
     /** Removes this node and all descendant nodes from the tree. */
-    def removeFromParent()
+    def removeFromParent(): Unit =
     {
         parent.children = parent.children.filterNot(_ == this)
         parent = null
@@ -292,13 +292,13 @@ trait TNode extends Gui
     /** Creates a sequence of this node and all descendants, sorted by [[zPosition]]. */
     def familyByZ = (Seq(this)++children).sortBy(_.zPosition)
 
-    protected[gui] final def update()
+    protected[gui] final def update(): Unit =
     {
         update_Impl()
         for (c <- childrenByZ) c.update()
     }
 
-    protected[gui] final def frameUpdate(mouse:Point, rframe:Float)
+    protected[gui] final def frameUpdate(mouse:Point, rframe:Float): Unit =
     {
         frameUpdate_Impl(mouse, rframe)
         for (c <- childrenByZ) c.frameUpdate(mouse-position, rframe)
@@ -343,7 +343,7 @@ trait TNode extends Gui
         operate2(consumed){keyPressed_Impl(ch, keycode, _)}{_.keyPressed(ch, keycode, _)}
     }
 
-    protected[gui] def drawBack(mouse:Point, rframe:Float)
+    protected[gui] def drawBack(mouse:Point, rframe:Float): Unit =
     {
         if (!hidden)
         {
@@ -361,7 +361,7 @@ trait TNode extends Gui
         }
     }
 
-    protected[gui] def drawFront(mouse:Point, rframe:Float)
+    protected[gui] def drawFront(mouse:Point, rframe:Float): Unit =
     {
         if (!hidden)
         {
@@ -380,7 +380,7 @@ trait TNode extends Gui
     }
 
     //todo move to NodeGui.
-    protected[gui] def rootDrawBack(mouse:Point, rframe:Float)
+    protected[gui] def rootDrawBack(mouse:Point, rframe:Float): Unit =
     {
         if (!hidden)
         {
@@ -396,7 +396,7 @@ trait TNode extends Gui
     }
 
     //todo move to NodeGui.
-    protected[gui] def rootDrawFront(mouse:Point, rframe:Float)
+    protected[gui] def rootDrawFront(mouse:Point, rframe:Float): Unit =
     {
         if (!hidden)
         {
@@ -409,15 +409,15 @@ trait TNode extends Gui
         }
     }
 
-    protected[gui] def translateTo(){translate(position.x, position.y, 0)}//zPosition-(if (parent == null) 0 else parent.zPosition))}
-    protected[gui] def translateFrom(){translate(-position.x, -position.y, 0)}// -(zPosition-(if (parent == null) 0 else parent.zPosition)))}
+    protected[gui] def translateTo(): Unit ={translate(position.x, position.y, 0)}//zPosition-(if (parent == null) 0 else parent.zPosition))}
+    protected[gui] def translateFrom(): Unit ={translate(-position.x, -position.y, 0)}// -(zPosition-(if (parent == null) 0 else parent.zPosition)))}
 
-    protected[gui] def translateToScreen()
+    protected[gui] def translateToScreen(): Unit =
     {
         val Point(sx, sy) = parent.convertPointToScreen(Point.zeroPoint)
         translate(-sx, -sy, 0)
     }
-    protected[gui] def translateFromScreen()
+    protected[gui] def translateFromScreen(): Unit =
     {
         val Point(sx, sy) = parent.convertPointToScreen(Point.zeroPoint)
         translate(sx, sy, 0)
@@ -428,7 +428,7 @@ trait TNode extends Gui
     /**
       * Called every tick from the main game loop.
       */
-    def update_Impl(){}
+    def update_Impl(): Unit ={}
 
     /**
       * Called every frame before background draw call.
@@ -436,10 +436,10 @@ trait TNode extends Gui
       * @param mouse The current position of the mouse, relative to the parent.
       * @param rframe The partial frame until the next frame.
       */
-    def frameUpdate_Impl(mouse:Point, rframe:Float){}
+    def frameUpdate_Impl(mouse:Point, rframe:Float): Unit ={}
 
     /** Called when this node is added to another as a child. */
-    def onAddedToParent_Impl(){}
+    def onAddedToParent_Impl(): Unit ={}
 
     /**
       * Called when the mouse button is clicked.
@@ -506,7 +506,7 @@ trait TNode extends Gui
       * @param mouse The current position of the mouse, relative to the parent.
       * @param rframe The partial frame until the next frame.
       */
-    def drawBack_Impl(mouse:Point, rframe:Float){}
+    def drawBack_Impl(mouse:Point, rframe:Float): Unit ={}
 
     /**
       * Called to draw the background. All drawing is done relative to the parent, as GL11 is translated to the
@@ -517,5 +517,5 @@ trait TNode extends Gui
       * @param mouse The current position of the mouse, relative to the parent.
       * @param rframe The partial frame until the next frame.
       */
-    def drawFront_Impl(mouse:Point, rframe:Float){}
+    def drawFront_Impl(mouse:Point, rframe:Float): Unit ={}
 }

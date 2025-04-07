@@ -17,20 +17,20 @@ object MrTJPCoreMod
     val log = LogManager.getFormatterLogger("MrTJPCore")
 
     @Mod.EventHandler
-    def preInit(event:FMLPreInitializationEvent)
+    def preInit(event:FMLPreInitializationEvent): Unit =
     {
         MrTJPConfig.loadConfig()
         MrTJPCoreProxy.preInit()
     }
 
     @Mod.EventHandler
-    def init(event:FMLInitializationEvent)
+    def init(event:FMLInitializationEvent): Unit =
     {
         MrTJPCoreProxy.init()
     }
 
     @Mod.EventHandler
-    def postInit(event:FMLPostInitializationEvent)
+    def postInit(event:FMLPostInitializationEvent): Unit =
     {
         MrTJPCoreProxy.postInit()
     }
@@ -46,7 +46,7 @@ object MrTJPConfig extends ModConfig("mrtjpcore")
 
     override def getFileName = "MrTJPCore"
 
-    override protected def initValues()
+    override protected def initValues(): Unit =
     {
         val general = new BaseCategory("General", "General settings for MrTJPCore")
         check_versions = general.put("Version Checking", check_versions, "Flag to enable or disable the update checker.")

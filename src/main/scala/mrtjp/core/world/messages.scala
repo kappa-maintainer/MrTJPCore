@@ -37,7 +37,7 @@ object Messenger
      * @param z
      * @param mail
      */
-    def addMessage(x: Double, y: Double, z: Double, mail: String)
+    def addMessage(x: Double, y: Double, z: Double, mail: String): Unit =
     {
         val location = new BlockPos(Math.floor(x).asInstanceOf[Int], Math.floor(y).asInstanceOf[Int], Math.floor(z).asInstanceOf[Int])
 
@@ -51,7 +51,7 @@ object Messenger
     }
 
     @SubscribeEvent
-    def renderMessages(event:RenderWorldLastEvent)
+    def renderMessages(event:RenderWorldLastEvent): Unit =
     {
         val w = Minecraft.getMinecraft.world
         if (w == null) return
@@ -84,7 +84,7 @@ object Messenger
         popAttrib()
     }
 
-    private def readMessage(m:Message, time:Double)
+    private def readMessage(m:Message, time:Double): Unit =
     {
         var width = 0
         var height = 0
@@ -136,7 +136,7 @@ object Messenger
 
 abstract class MailOption
 {
-    def modify(mes:Message)
+    def modify(mes:Message): Unit =
     {
         if (mes.msg contains tag)
         {
@@ -145,7 +145,7 @@ abstract class MailOption
         }
     }
 
-    def change(mes:Message)
+    def change(mes:Message): Unit 
 
     def tag:String
 }
@@ -154,7 +154,7 @@ object Replace extends MailOption
 {
     override def tag = "/#f"
 
-    override def change(mes: Message)
+    override def change(mes: Message): Unit =
     {
         for (m <- Messenger.messages.clone()) if (m.location == mes.location)
         {
@@ -168,7 +168,7 @@ object Combine extends MailOption
 {
     override def tag = "/#c"
 
-    override def change(mes: Message)
+    override def change(mes: Message): Unit =
     {
         for (m <- Messenger.messages.clone()) if (m.location == mes.location)
         {

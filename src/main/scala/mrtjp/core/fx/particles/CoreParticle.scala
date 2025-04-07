@@ -25,7 +25,7 @@ class CoreParticle(w:World) extends Particle(w, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.
 
     private var actions = ListBuffer[ParticleAction]()
 
-    def setAge(age:Int)
+    def setAge(age:Int): Unit =
     {
         particleAge = age
     }
@@ -34,7 +34,7 @@ class CoreParticle(w:World) extends Particle(w, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.
 
     def getMaxAge = particleMaxAge
 
-    def runAction(action:ParticleAction)
+    def runAction(action:ParticleAction): Unit =
     {
         if (!action.canOperate(this))
             throw new RuntimeException("Particle action was run on an incompatible particle class.")
@@ -43,14 +43,14 @@ class CoreParticle(w:World) extends Particle(w, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.
         actions += a1
     }
 
-    def removeAction(action:ParticleAction)
+    def removeAction(action:ParticleAction): Unit =
     {
         val idx = actions.indexOf(action)
         if (idx > -1)
             actions.remove(idx)
     }
 
-    override def onUpdate()
+    override def onUpdate(): Unit =
     {
         if (hasVelocity) move(motionX, motionY, motionZ)
 
@@ -60,7 +60,7 @@ class CoreParticle(w:World) extends Particle(w, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.
         if (particleAge > particleMaxAge && !isImmortal) setExpired()
     }
 
-    override def renderParticle(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float)
+    override def renderParticle(buffer:BufferBuilder, entity:Entity, frame:Float, cosyaw:Float, cospitch:Float, sinyaw:Float, sinsinpitch:Float, cossinpitch:Float): Unit =
     {
         actions.foreach(_.runOn(this, frame))
         actions = actions.filterNot(_.isFinished)

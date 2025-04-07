@@ -12,34 +12,34 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 class MrTJPCoreProxy_server
 {
-    def preInit(){}
+    def preInit(): Unit ={}
 
-    def init()
+    def init(): Unit =
     {
         PacketCustom.assignHandler(MrTJPCoreSPH.channel, MrTJPCoreSPH)
         //SimpleGenHandler.init()
     }
 
-    def postInit(){}
+    def postInit(): Unit ={}
 }
 
 class MrTJPCoreProxy_client extends MrTJPCoreProxy_server
 {
     @SideOnly(Side.CLIENT)
-    override def preInit()
+    override def preInit(): Unit =
     {
         super.preInit()
     }
 
     @SideOnly(Side.CLIENT)
-    override def init()
+    override def init(): Unit =
     {
         super.init()
         PacketCustom.assignHandler(MrTJPCoreCPH.channel, MrTJPCoreCPH)
     }
 
     @SideOnly(Side.CLIENT)
-    override def postInit()
+    override def postInit(): Unit =
     {
         MinecraftForge.EVENT_BUS.register(Messenger)
 //        MinecraftForge.EVENT_BUS.register(RenderTicker)

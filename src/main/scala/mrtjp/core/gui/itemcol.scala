@@ -25,14 +25,14 @@ class ItemListNode extends TNode
     var itemSize = Size(16, 16)
     var gridWidth = 3
 
-    var displayNodeFactory = {stack:ItemKeyStack => new ItemDisplayNode}
+    var displayNodeFactory = {(stack:ItemKeyStack) => new ItemDisplayNode}
     var cullFrame = Rect.infiniteRect
 
     private var dispNodes = Seq[ItemDisplayNode]()
 
     override def frame = Rect(position, itemSize.multiply(math.min(items.size, gridWidth), items.size/gridWidth+1))
 
-    def reset()
+    def reset(): Unit =
     {
         val it = items.iterator
         var (x, y) = (0, 0)
@@ -78,7 +78,7 @@ class ItemDisplayNode extends TNode
 
     override def frame = Rect(position, size)
 
-    override def drawBack_Impl(mouse:Point, rframe:Float)
+    override def drawBack_Impl(mouse:Point, rframe:Float): Unit =
     {
         GuiDraw.drawRect(position.x, position.y, size.width, size.height, backgroundColour)
         ItemDisplayNode.renderItem(position, size, zPosition, drawNumber, stack.makeStack)
@@ -94,13 +94,13 @@ class ItemDisplayNode extends TNode
         else false
     }
 
-    override def drawFront_Impl(mouse:Point, rframe:Float)
+    override def drawFront_Impl(mouse:Point, rframe:Float): Unit =
     {
         if (drawTooltip && frame.contains(mouse) && rayTest(mouse))
             drawTooltip(mouse)
     }
 
-    def drawTooltip(mouse:Point)
+    def drawTooltip(mouse:Point): Unit =
     {
         ClipNode.tempDisableScissoring()
         //draw tooltip with absolute coords to allow it to force-fit on screen
@@ -109,7 +109,7 @@ class ItemDisplayNode extends TNode
 
         val lines = stack.makeStack.getTooltip(mcInst.player,
             if(mcInst.gameSettings.advancedItemTooltips) ADVANCED else NORMAL)
-        val l2 = Seq(lines.asScala.head)++lines.asScala.tail.map(TextFormatting.GRAY + _)
+        val l2 = Seq(lines.asScala.head)++lines.asScala.tail.map(TextFormatting.GRAY.toString + _)
         GuiDraw.drawMultiLineTip(mx+12, my-12, l2.asJava)
 
         translateFromScreen()
@@ -121,7 +121,7 @@ object ItemDisplayNode
 {
     val renderItem = Minecraft.getMinecraft.getRenderItem
 
-    def renderItem(position:Point, size:Size, zPosition:Double, drawNumber:Boolean, stack:ItemStack)
+    def renderItem(position:Point, size:Size, zPosition:Double, drawNumber:Boolean, stack:ItemStack): Unit =
     {
         val font = stack.getItem.getFontRenderer(stack) match {
             case null => Minecraft.getMinecraft.fontRenderer
@@ -161,7 +161,7 @@ object ItemDisplayNode
         font.setUnicodeFlag(f)
     }
 
-    def glItemPre()
+    def glItemPre(): Unit =
     {
         pushMatrix()
         color(1.0F, 1.0F, 1.0F, 1.0F)
@@ -172,7 +172,7 @@ object ItemDisplayNode
         disableLighting()
     }
 
-    def glItemPost()
+    def glItemPost(): Unit =
     {
         enableDepth()
         popMatrix()

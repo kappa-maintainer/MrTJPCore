@@ -18,13 +18,13 @@ class TextureChangeAction extends ParticleAction
 
     override def canOperate(p:CoreParticle) = p.isInstanceOf[TTextureParticle]
 
-    override def operate(p:CoreParticle, time:Double)
+    override def operate(p:CoreParticle, time:Double): Unit =
     {
         p.asInstanceOf[TTextureParticle].texture = tex
         isFinished = true
     }
 
-    override def compile(p:CoreParticle){}
+    override def compile(p:CoreParticle): Unit ={}
 
     override def copy = ParticleAction.changeTexture(tex)
 }

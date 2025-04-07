@@ -62,7 +62,7 @@ object GuiLib
       * @param x The x coordinate of the top-left position of the slots to be rendered.
       * @param y The y coordinate of the top-left position of the slots to be rendered.
       */
-    def drawPlayerInvBackground(x:Int, y:Int)
+    def drawPlayerInvBackground(x:Int, y:Int): Unit =
     {
         for ((x, y) <- createSlotGrid(x, y, 9, 3, 0, 0))
             drawSlotBackground(x-1, y-1)
@@ -76,7 +76,7 @@ object GuiLib
       * @param x The x coordinate of the top-left position of the slot to be rendered.
       * @param y The y coordinate of the top-left position of the slot to be rendered.
       */
-    def drawSlotBackground(x:Int, y:Int)
+    def drawSlotBackground(x:Int, y:Int): Unit =
     {
         color(1, 1, 1, 1)
 
@@ -100,7 +100,7 @@ object GuiLib
       * @param height The height of the box.
       * @param zLevel The z-position of the box.
       */
-    def drawGuiBox(x:Int, y:Int, width:Int, height:Int, zLevel:Float)
+    def drawGuiBox(x:Int, y:Int, width:Int, height:Int, zLevel:Float): Unit =
     {
         drawGuiBox(x, y, width, height, zLevel, true, true, true, true)
     }
@@ -119,7 +119,7 @@ object GuiLib
       * @param bottom True if should render the bottom edge.
       * @param right True if should render the right edge.
       */
-    def drawGuiBox(x:Int, y:Int, width:Int, height:Int, zLevel:Float, top:Boolean, left:Boolean, bottom:Boolean, right:Boolean)
+    def drawGuiBox(x:Int, y:Int, width:Int, height:Int, zLevel:Float, top:Boolean, left:Boolean, bottom:Boolean, right:Boolean): Unit =
     {
         val u = 1
         val v = 29
@@ -183,7 +183,7 @@ object GuiLib
       * @param h The height of the bar to be rendered.
       * @param prog The percentage progress of the bar, 100 being full at the top and 0 being empty at the bottom.
       */
-    def drawVerticalTank(x:Int, y:Int, u:Int, v:Int, w:Int, h:Int, prog:Int)
+    def drawVerticalTank(x:Int, y:Int, u:Int, v:Int, w:Int, h:Int, prog:Int): Unit =
     {
         GuiDraw.drawTexturedModalRect(x, y+h-prog, u, v+h-prog, w, prog)
     }

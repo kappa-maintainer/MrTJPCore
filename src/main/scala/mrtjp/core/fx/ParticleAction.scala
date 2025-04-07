@@ -14,11 +14,11 @@ abstract class ParticleAction
     var life = 0
     var lastTime = 0.0
 
-    def tickLife() {life += 1}
+    def tickLife(): Unit = {life += 1}
 
     def canOperate(p:CoreParticle) = true
 
-    def runOn(p:CoreParticle, frame:Float)
+    def runOn(p:CoreParticle, frame:Float): Unit =
     {
         if (!isFinished)
         {
@@ -28,11 +28,11 @@ abstract class ParticleAction
         }
     }
 
-    def operate(p:CoreParticle, time:Double)
+    def operate(p:CoreParticle, time:Double): Unit 
 
-    def compile(p:CoreParticle){}
+    def compile(p:CoreParticle): Unit ={}
 
-    def reset()
+    def reset(): Unit =
     {
         isFinished = false
         life = 0

@@ -8,7 +8,7 @@ package mrtjp.core.util
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.BitSet
 import scala.collection.mutable.{BitSet => MBitSet, Builder => MBuilder}
-import scala.collection.{IterableOnce, SortedSet, immutable}
+import scala.collection.{BuildFrom, IterableOnce, SortedSet, immutable}
 
 trait Enum
 {
@@ -103,10 +103,10 @@ trait Enum
             def result() = new ValSet(b.toImmutable)
         }
 
-        implicit def canBuildFrom = new CanBuildFrom[ValSet, EnumVal, ValSet]
-        {
-            def newBuilder(from:ValSet) = newBuilder(from)
-            def fromSpecific(from:ValSet)(it: IterableOnce[EnumVal]) = {
+        implicit def canBuildFrom: BuildFrom[ValSet, EnumVal, ValSet] = new CanBuildFrom[ValSet, EnumVal, ValSet] {
+            def newBuilder(from: ValSet) = newBuilder(from)
+
+            def fromSpecific(from: ValSet)(it: IterableOnce[EnumVal]) = {
                 val out = empty
                 it.foreach(out.excl)
                 out

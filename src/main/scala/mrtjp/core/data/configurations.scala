@@ -85,7 +85,7 @@ abstract class ModConfig(modID:String)
     def getFileName = modID
 
     private var registered = false
-    def loadConfig()
+    def loadConfig(): Unit =
     {
         config = new Configuration(new File(Loader.instance.getConfigDir, getFileName+".cfg"))
         initValues()
@@ -99,7 +99,7 @@ abstract class ModConfig(modID:String)
     }
 
     @SubscribeEvent
-    def onConfigChanged(event:ConfigChangedEvent.OnConfigChangedEvent)
+    def onConfigChanged(event:ConfigChangedEvent.OnConfigChangedEvent): Unit =
     {
         if (event.getModID == modID)
         {
@@ -108,7 +108,7 @@ abstract class ModConfig(modID:String)
         }
     }
 
-    protected def initValues()
+    protected def initValues(): Unit 
 }
 
 object SpecialConfigGui
@@ -127,7 +127,7 @@ class SpecialConfigGui(parent:GuiScreen, modid:String, config:Configuration) ext
 
 trait TModGuiFactory extends IModGuiFactory
 {
-    override def initialize(minecraftInstance: Minecraft){}
+    override def initialize(minecraftInstance: Minecraft): Unit ={}
     override def runtimeGuiCategories() = null
     override def hasConfigGui = true
 }
