@@ -6,10 +6,10 @@
 package mrtjp.core.data
 
 import java.io.File
-import java.util.{ArrayList as JAList}
-
+import java.util.ArrayList as JAList
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.config.{ConfigElement, Configuration, Property}
 import net.minecraftforge.fml.client.IModGuiFactory
 import net.minecraftforge.fml.client.IModGuiFactory.RuntimeOptionCategoryElement
@@ -19,7 +19,8 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.{FMLCommonHandler, Loader}
 
-import scala.collection.JavaConverters.*
+import java.util
+import scala.annotation.tailrec
 
 abstract class ModConfig(modID:String)
 :
@@ -38,6 +39,7 @@ abstract class ModConfig(modID:String)
 
         def put[T](key:String, value:T, comment:String, force:Boolean):T =
             import net.minecraftforge.common.config.Property.Type.*
+            @tailrec
             def getType(value:Any):Property.Type = value match
                 case xs:Array[_] => getType(xs.head)
                 case b:Boolean   => BOOLEAN
@@ -69,9 +71,9 @@ abstract class ModConfig(modID:String)
                 case _              => prop.getString
             reslult.asInstanceOf[T]
 
-        def containsKey(key:Any) = cat.containsKey(key.toString)
+        def containsKey(key: Any): Boolean = cat.containsKey(key.toString)
 
-    def getFileName = modID
+    def getFileName: String = modID
 
     private var registered = false
     def loadConfig(): Unit =
@@ -80,7 +82,7 @@ abstract class ModConfig(modID:String)
         if config.hasChanged then config.save()
 
         if !registered then
-            FMLCommonHandler.instance.bus.register(this)
+            MinecraftForge.EVENT_BUS.register(this)
             registered = true
 
     @SubscribeEvent
@@ -94,13 +96,13 @@ abstract class ModConfig(modID:String)
 object SpecialConfigGui
 :
     def buildCategories(config:Configuration):JAList[IConfigElement] =
-        new JAList[IConfigElement](config.getCategoryNames.asScala.map(s =>
+        new util.ArrayList[IConfigElement](config.getCategoryNames.stream().map(s =>
         {
             new DummyCategoryElement(s, "", new ConfigElement(config.getCategory(s)).getChildElements)
             {
-                override def getComment = config.getCategory(s).getComment
+                override def getComment: String = config.getCategory(s).getComment
             }
-        }).asJava)
+        }).toList)
 
 class SpecialConfigGui(parent:GuiScreen, modid:String, config:Configuration) extends GuiConfig(parent, SpecialConfigGui.buildCategories(config), modid, false, false, GuiConfig.getAbridgedConfigPath(config.toString))
 

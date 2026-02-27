@@ -6,10 +6,9 @@
 package mrtjp.core.block
 
 import java.util.{Random, ArrayList as JArrayList, List as JList}
-
 import codechicken.lib.data.{MCDataInput, MCDataOutput}
 import codechicken.lib.packet.{ICustomPacketTile, PacketCustom}
-import codechicken.lib.vec.{Cuboid6, Rotation, Vector3}
+import codechicken.lib.vec.{Cuboid6, Rotation, Transformation, Vector3}
 import mrtjp.core.handler.MrTJPCoreSPH
 import mrtjp.core.world.WorldLib
 import net.minecraft.block.Block
@@ -47,14 +46,14 @@ class MultiTileBlock(mat:Material) extends Block(mat)
 
     override def createBlockState() = new BlockStateContainer(this, TILE_INDEX)
 
-    override def getActualState(state:IBlockState, world:IBlockAccess, pos:BlockPos) =
+    override def getActualState(state:IBlockState, world:IBlockAccess, pos:BlockPos): IBlockState =
         world.getTileEntity(pos) match
             case t:MTBlockTile => state.withProperty(TILE_INDEX, tiles.indexOf(t.getClass).asInstanceOf[Integer])
             case _ => state
 
-    override def getMetaFromState(state:IBlockState) = state.getValue(TILE_INDEX.asInstanceOf[IProperty[Nothing]])
+    override def getMetaFromState(state:IBlockState): Int = state.getValue(TILE_INDEX.asInstanceOf[IProperty[Nothing]])
 
-    override def getStateFromMeta(meta:Int) = getDefaultState.withProperty(TILE_INDEX, (meta%16).asInstanceOf[Integer])
+    override def getStateFromMeta(meta:Int): IBlockState = getDefaultState.withProperty(TILE_INDEX, (meta%16).asInstanceOf[Integer])
 
     def addTile[A <: MTBlockTile](t:Class[A], index:Int): Unit =
         tiles(index) = t
@@ -62,21 +61,21 @@ class MultiTileBlock(mat:Material) extends Block(mat)
 
     override def hasTileEntity(state:IBlockState) = true
 
-    override def createTileEntity(world:World, state:IBlockState) =
+    override def createTileEntity(world:World, state:IBlockState): TileEntity =
         var t:MTBlockTile = null
-        try { t = tiles(getMetaFromState(state)).newInstance }
+        try { t = tiles(getMetaFromState(state)).getConstructor(Array.empty[Class[?]](0)).newInstance() }
         catch {case e:Exception => e.printStackTrace()}
         t
 
-    override def damageDropped(state:IBlockState) = getMetaFromState(state)
+    override def damageDropped(state:IBlockState): Int = getMetaFromState(state)
 
-    override def isBlockNormalCube(state:IBlockState) = false
+    override def isBlockNormalCube(state:IBlockState): Boolean = false
 
-    override def isOpaqueCube(state:IBlockState) = false
+    override def isOpaqueCube(state:IBlockState): Boolean = false
 
-    override def isFullCube(state:IBlockState) = false
+    override def isFullCube(state:IBlockState): Boolean = false
 
-    override def isFullBlock(state:IBlockState) = false
+    override def isFullBlock(state:IBlockState): Boolean = false
 
     override def getTickRandomly = true
 
@@ -89,40 +88,40 @@ class MultiTileBlock(mat:Material) extends Block(mat)
                     collidingBoxes.add(bounds.offset(pos))
             case _ =>
 
-    override def getBoundingBox(state:IBlockState, world:IBlockAccess, pos:BlockPos) =
+    override def getBoundingBox(state:IBlockState, world:IBlockAccess, pos:BlockPos): AxisAlignedBB =
         world.getTileEntity(pos) match
             case t:MTBlockTile => t.getBlockBounds.aabb()
             case _ => super.getBoundingBox(state, world, pos)
 
-    override def getBlockFaceShape(world: IBlockAccess, state: IBlockState, pos: BlockPos, face: EnumFacing) =
+    override def getBlockFaceShape(world: IBlockAccess, state: IBlockState, pos: BlockPos, face: EnumFacing): BlockFaceShape =
         world.getTileEntity(pos) match
             case t:MTBlockTile => t.getBlockFaceShape(face.ordinal)
             case _=> BlockFaceShape.UNDEFINED
 
-    @Deprecated//Forge has deprecated this, getBlockFaceShape is the thing to use now.
-    override final def isSideSolid(state:IBlockState, world:IBlockAccess, pos:BlockPos, side:EnumFacing) =
+    @Deprecated //Forge has deprecated this, getBlockFaceShape is the thing to use now.
+    override final def isSideSolid(state: IBlockState, world: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean =
         getBlockFaceShape(world, state, pos, side) == BlockFaceShape.SOLID
 
-    override def canPlaceTorchOnTop(state:IBlockState, world:IBlockAccess, pos:BlockPos) =
+    override def canPlaceTorchOnTop(state: IBlockState, world: IBlockAccess, pos: BlockPos): Boolean =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.canPlaceTorchOnTop
+            case t: MTBlockTile => t.canPlaceTorchOnTop
 
-    override def getExplosionResistance(world:World, pos:BlockPos, exploder:Entity, explosion:Explosion) =
+    override def getExplosionResistance(world:World, pos:BlockPos, exploder:Entity, explosion:Explosion): Float =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.getExplosionResistance
+            case t:MTBlockTile => t.getExplosionResistance.toFloat
             case _ => 0F
 
-    override def getLightValue(state:IBlockState, world:IBlockAccess, pos:BlockPos) =
+    override def getLightValue(state: IBlockState, world: IBlockAccess, pos: BlockPos): Int =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.getLightValue
+            case t: MTBlockTile => t.getLightValue
             case _ => super.getLightValue(state, world, pos)
 
-    override def getPlayerRelativeBlockHardness(state:IBlockState, player:EntityPlayer, world:World, pos:BlockPos) =
+    override def getPlayerRelativeBlockHardness(state: IBlockState, player: EntityPlayer, world: World, pos: BlockPos): Float =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.getHardness
+            case t: MTBlockTile => t.getHardness
             case _ => super.getPlayerRelativeBlockHardness(state, player, world, pos)
 
-    override def removedByPlayer(state:IBlockState, world:World, pos:BlockPos, player:EntityPlayer, willHarvest:Boolean) =
+    override def removedByPlayer(state: IBlockState, world: World, pos: BlockPos, player: EntityPlayer, willHarvest: Boolean): Boolean =
         if world.isRemote then true
         else
             val b = state.getBlock
@@ -141,22 +140,22 @@ class MultiTileBlock(mat:Material) extends Block(mat)
 
     override def harvestBlock(worldIn:World, player:EntityPlayer, pos:BlockPos, state:IBlockState, te:TileEntity, stack:ItemStack): Unit ={}
 
-    override def getDrops(world:IBlockAccess, pos:BlockPos, state:IBlockState, fortune:Int) =
+    override def getDrops(world: IBlockAccess, pos: BlockPos, state: IBlockState, fortune: Int): java.util.List[ItemStack] =
         val list = new ListBuffer[ItemStack]
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.addHarvestContents(list)
+            case t: MTBlockTile => t.addHarvestContents(list)
             case _ =>
         new JArrayList[ItemStack](list.asJava)
 
-    override def getPickBlock(state:IBlockState, target:RayTraceResult, world:World, pos:BlockPos, player:EntityPlayer) =
+    override def getPickBlock(state: IBlockState, target: RayTraceResult, world: World, pos: BlockPos, player: EntityPlayer): ItemStack =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.getPickBlock
+            case t: MTBlockTile => t.getPickBlock
             case _ => super.getPickBlock(state, target, world, pos, player)
 
 
-    override def onBlockActivated(world:World, pos:BlockPos, state:IBlockState, player:EntityPlayer, hand:EnumHand, facing:EnumFacing, hitX:Float, hitY:Float, hitZ:Float)  =
+    override def onBlockActivated(world: World, pos: BlockPos, state: IBlockState, player: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.onBlockActivated(player, facing.ordinal)
+            case t: MTBlockTile => t.onBlockActivated(player, facing.ordinal)
             case _ => false
 
     override def onBlockClicked(world:World, pos:BlockPos, player:EntityPlayer): Unit =
@@ -195,36 +194,36 @@ class MultiTileBlock(mat:Material) extends Block(mat)
             case t:MTBlockTile => t.onBlockPlaced(side, player, stack)
             case _ =>
 
-    override def getWeakChanges(world:IBlockAccess, pos:BlockPos) =
+    override def getWeakChanges(world: IBlockAccess, pos: BlockPos): Boolean =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.getWeakChanges
+            case t: MTBlockTile => t.getWeakChanges
             case _ => false
 
-    override def canProvidePower(state:IBlockState) = true
+    override def canProvidePower(state: IBlockState): Boolean = true
 
-    override def canConnectRedstone(state:IBlockState, world:IBlockAccess, pos:BlockPos, side:EnumFacing) =
+    override def canConnectRedstone(state: IBlockState, world: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.canConnectRS
+            case t: MTBlockTile => t.canConnectRS
             case _ => super.canConnectRedstone(state, world, pos, side)
 
-    override def getStrongPower(state:IBlockState, world:IBlockAccess, pos:BlockPos, side:EnumFacing) =
+    override def getStrongPower(state: IBlockState, world: IBlockAccess, pos: BlockPos, side: EnumFacing): Int =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.strongPower(side.ordinal)
+            case t: MTBlockTile => t.strongPower(side.ordinal)
             case _ => 0
 
-    override def getWeakPower(state:IBlockState, world:IBlockAccess, pos:BlockPos, side:EnumFacing) =
+    override def getWeakPower(state: IBlockState, world: IBlockAccess, pos: BlockPos, side: EnumFacing): Int =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.weakPower(side.ordinal)
+            case t: MTBlockTile => t.weakPower(side.ordinal)
             case _ => 0
 
-    override def isFireSource(world:World, pos:BlockPos, side:EnumFacing) =
+    override def isFireSource(world: World, pos: BlockPos, side: EnumFacing): Boolean =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.isFireSource(side.ordinal)
+            case t: MTBlockTile => t.isFireSource(side.ordinal)
             case _ => super.isFireSource(world, pos, side)
 
-    override def updateTick(world:World, pos:BlockPos, state:IBlockState, rand:Random) =
+    override def updateTick(world: World, pos: BlockPos, state: IBlockState, rand: Random): Unit =
         world.getTileEntity(pos) match
-            case t:MTBlockTile => t.randomTick(rand)
+            case t: MTBlockTile => t.randomTick(rand)
             case _ => super.updateTick(world, pos, state, rand)
 
     @SideOnly(Side.CLIENT)
@@ -242,14 +241,14 @@ trait TTileOrient extends MTBlockTile
 :
     var orientation:Byte = 0
 
-    def side = orientation>>2
+    def side: Int = orientation >> 2
 
     def setSide(s:Int): Unit =
         val oldOrient = orientation
         orientation = (orientation&0x3|s<<2).toByte
         if oldOrient != orientation then onOrientChanged(oldOrient)
 
-    def rotation = orientation&0x3
+    def rotation: Int = orientation & 0x3
 
     def setRotation(r:Int): Unit =
         val oldOrient = orientation
@@ -258,21 +257,21 @@ trait TTileOrient extends MTBlockTile
 
     //def position = new BlockCoord(getPos)
 
-    def rotationT = Rotation.sideOrientation(side, rotation).at(Vector3.center)
+    def rotationT: Transformation = Rotation.sideOrientation(side, rotation).at(Vector3.center)
 
     def onOrientChanged(oldOrient:Int): Unit ={}
 
     // internal r from absRot
-    def toInternal(absRot:Int) = (absRot+6-rotation)%4
+    def toInternal(absRot: Int): Int = (absRot + 6 - rotation) % 4
 
     // absRot from internal r
-    def toAbsolute(r:Int) = (r+rotation+2)%4
+    def toAbsolute(r: Int): Int = (r + rotation + 2) % 4
 
     // absDir from absRot
-    def absoluteDir(absRot:Int) = Rotation.rotateSide(side, absRot)
+    def absoluteDir(absRot: Int): Int = Rotation.rotateSide(side, absRot)
 
     // absRot from absDir
-    def absoluteRot(absDir:Int) = Rotation.rotationTo(side, absDir)
+    def absoluteRot(absDir: Int): Int = Rotation.rotationTo(side, absDir)
 
 abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITickable
 :
@@ -290,7 +289,8 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
 
     def canConnectRS = false
     def strongPower(side:Int) = 0
-    def weakPower(side:Int) = strongPower(side)
+
+    def weakPower(side: Int): Int = strongPower(side)
 
     def getLightValue = 0
 
@@ -302,7 +302,7 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
 
     def getExplosionResistance = 0
 
-    def getHardness = 1/30F
+    def getHardness: Float = 1 / 30F
 
     def onBlockActivated(player:EntityPlayer, side:Int) = false
 
@@ -312,9 +312,9 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
 
     def onEntityWalk(ent:Entity): Unit ={}
 
-    def getBlockBounds = Cuboid6.full
+    def getBlockBounds: Cuboid6 = Cuboid6.full
 
-    def getCollisionBounds = Cuboid6.full
+    def getCollisionBounds: Cuboid6 = Cuboid6.full
 
     def onScheduledTick(): Unit ={}
 
@@ -334,9 +334,9 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
     def addHarvestContents(ist:ListBuffer[ItemStack]): Unit =
         ist += getPickBlock
 
-    def x = getPos.getX
-    def y = getPos.getY
-    def z = getPos.getZ
+    def x: Int = getPos.getX
+    def y: Int = getPos.getY
+    def z: Int = getPos.getZ
 
     def scheduleTick(time:Int): Unit =
         val tn = world.getTotalWorldTime+time
@@ -344,7 +344,7 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
         schedTick = tn
         markDirty()
 
-    def isTickScheduled = schedTick >= 0L
+    def isTickScheduled: Boolean = schedTick >= 0L
 
     def breakBlock_do(): Unit =
         val il = new ListBuffer[ItemStack]
@@ -381,7 +381,7 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
             onScheduledTick()
             markDirty()
 
-    final override def writeToNBT(tag:NBTTagCompound) =
+    final override def writeToNBT(tag: NBTTagCompound): NBTTagCompound =
         super.writeToNBT(tag)
         tag.setLong("sched", schedTick)
         save(tag)
@@ -397,7 +397,7 @@ abstract class MTBlockTile extends TileEntity with ICustomPacketTile with ITicka
      * data. We are using standard writeDesc function then putting that
      * buffer into a NBT Tag.
      */
-    override def getUpdateTag =
+    override def getUpdateTag: NBTTagCompound =
         val tag = super.getUpdateTag
         val out = new PacketCustom(MrTJPCoreSPH.channel, MrTJPCoreSPH.tilePacket) //channel and type dont matter
         writeDesc(out)
