@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagCompound
 
 import scala.collection.immutable.HashMap
 import scala.IterableOnce
+import scala.language.implicitConversions
 
 object ItemKey
 :
@@ -22,23 +23,24 @@ object ItemKey
 
 class ItemKey(val item:Item, val itemDamage:Int, val tag:NBTTagCompound) extends Ordered[ItemKey]
 :
-    lazy val testStack = makeStack(1)
-    lazy val itemID = Item.getIdFromItem(item)
+    lazy val testStack: ItemStack = makeStack(1)
+    lazy val itemID: Int = Item.getIdFromItem(item)
 
     private val hash = itemID*1000001*itemDamage+(if tag != null then tag.hashCode else 0)
-    override def hashCode = hash
 
-    override def equals(other:Any) = other match
-        case that:ItemKey =>
+    override def hashCode: Int = hash
+
+    override def equals(other: Any): Boolean = other match
+        case that: ItemKey =>
             item == that.item && itemDamage == that.itemDamage &&
-                tag == that.tag
+              tag == that.tag
         case _ => false
 
-    override def toString = getName
+    override def toString: String = getName
 
-    def compare(that:ItemKey) =
-        val c = itemID-that.itemID
-        if c == 0 then itemDamage-that.itemDamage
+    def compare(that: ItemKey): Int =
+        val c = itemID - that.itemID
+        if c == 0 then itemDamage - that.itemDamage
         else c
 
     def makeStack(size:Int):ItemStack =
@@ -48,12 +50,14 @@ class ItemKey(val item:Item, val itemDamage:Int, val tag:NBTTagCompound) extends
 
     def copy = new ItemKey(item, itemDamage, tag)
 
-    def isEmpty = testStack.isEmpty
+    def isEmpty: Boolean = testStack.isEmpty
 
-    /** Interactions **/
-    def getItem = item
-    def getMaxStackSize = testStack.getMaxStackSize
-    def getName = testStack.getDisplayName
+    /** Interactions * */
+    def getItem: Item = item
+
+    def getMaxStackSize: Int = testStack.getMaxStackSize
+
+    def getName: String = testStack.getDisplayName
 
 object ItemKeyStack
 :
@@ -68,38 +72,38 @@ object ItemKeyStack
 
 class ItemKeyStack(val key:ItemKey, var stackSize:Int) extends Ordered[ItemKeyStack]
 :
-    override def hashCode = key.hashCode
+    override def hashCode: Int = key.hashCode
 
-    override def equals(other:Any) = other match
-        case that:ItemKeyStack =>
+    override def equals(other: Any): Boolean = other match
+        case that: ItemKeyStack =>
             key == that.key && stackSize == that.stackSize
         case _ => false
 
-    override def toString = "["+key.toString+", "+stackSize+"]"
+    override def toString: String = "[" + key.toString + ", " + stackSize + "]"
 
-    def makeStack = key.makeStack(stackSize)
+    def makeStack: ItemStack = key.makeStack(stackSize)
 
     def copy = new ItemKeyStack(key.copy, stackSize)
 
-    def isEmpty = key.isEmpty || stackSize <= 0
+    def isEmpty: Boolean = key.isEmpty || stackSize <= 0
 
-    def compare(that:ItemKeyStack) =
+    def compare(that: ItemKeyStack): Int =
         val c = key.compare(that.key)
-        if c == 0 then stackSize-that.stackSize
+        if c == 0 then stackSize - that.stackSize
         else c
 
 class ItemQueue
 :
     private var collection = HashMap[ItemKey, Int]()
 
-    def +=(elem:(ItemKey, Int)) =
+    def +=(elem: (ItemKey, Int)): ItemQueue =
         val current = collection.getOrElse(elem._1, 0)
-        collection += elem._1 -> (current+elem._2)
+        collection += elem._1 -> (current + elem._2)
         this
 
-    def ++=(xs:IterableOnce[(ItemKey, Int)]) = {xs foreach +=; this}
+    def ++=(xs:IterableOnce[(ItemKey, Int)]): ItemQueue = {xs.iterator.foreach(+=); this}
 
-    def ++=(that:ItemQueue) = {that.result.foreach(+=); this}
+    def ++=(that:ItemQueue): ItemQueue = {that.result.iterator.foreach(+=); this}
 
     def add(item:ItemKey, amount:Int): Unit =
         this += item -> amount
@@ -109,9 +113,13 @@ class ItemQueue
         if remaining > 0 then collection += elem._1 -> remaining
         else collection -= elem._1
 
-    def --=(xs:IterableOnce[(ItemKey, Int)]) = {xs foreach -=; this}
+    def --=(xs: IterableOnce[(ItemKey, Int)]): ItemQueue = {
+        xs.iterator.foreach(-=); this
+    }
 
-    def --=(that:ItemQueue) = {that.result.foreach(-=); this}
+    def --=(that: ItemQueue): ItemQueue = {
+        that.result.iterator.foreach(-=); this
+    }
 
     def remove(item:ItemKey, amount:Int): Unit =
         this -= item -> amount
@@ -120,21 +128,21 @@ class ItemQueue
 
     def clear(): Unit ={collection = HashMap[ItemKey, Int]()}
 
-    def isEmpty = collection.isEmpty
+    def isEmpty: Boolean = collection.isEmpty
 
-    def nonEmpty = collection.nonEmpty
+    def nonEmpty: Boolean = collection.nonEmpty
 
-    def keySet = collection.keySet
+    def keySet: Set[ItemKey] = collection.keySet
 
-    def count(p:ItemKey => Boolean) =
-        collection.foldLeft(0){(i, pair) =>
-            if p(pair._1) then i+pair._2 else i
+    def count(p: ItemKey => Boolean): Int =
+        collection.foldLeft(0) { (i, pair) =>
+            if p(pair._1) then i + pair._2 else i
         }
 
-    def countItems(p:ItemKey => Boolean) =
+    def countItems(p: ItemKey => Boolean): Int =
         collection.count(pair => p(pair._1))
 
-    def result =
+    def result: Map[ItemKey, Int] =
         val b = HashMap.newBuilder[ItemKey, Int]
         b ++= collection
         b.result()

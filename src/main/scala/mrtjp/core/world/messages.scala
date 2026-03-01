@@ -17,6 +17,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
 import scala.collection.mutable
+import scala.util.boundary
+import scala.util.boundary.break
 
 object Messenger
 :
@@ -76,7 +78,7 @@ object Messenger
 
         enableLighting()
         disableBlend()
-        color(1, 1, 1, 1)
+        color(1.0f, 1.0f, 1.0f, 1.0f)
         popMatrix()
         popAttrib()
 
@@ -100,13 +102,13 @@ object Messenger
         rotate((-Minecraft.getMinecraft.getRenderManager.playerViewY+8*Math.sin((m.x.asInstanceOf[Int]^m.z.asInstanceOf[Int])+time/6)).asInstanceOf[Float], 0.0F, 1.0F, 0.0F)
         rotate(Minecraft.getMinecraft.getRenderManager.playerViewX, 1.0F, 0.0F, 0.0F)
         scale(-scaling, -scaling, scaling)
-        translate(0.0F, -10*lines.length, 0.0F)
+        translate(0.0F, -10*lines.length.toFloat, 0.0F)
 
         val var16 = (lines.length-1)*10
         val var17 = width/2
 
         disableTexture2D()
-        color(0, 0, 0, 0.25f)
+        color(0.0f, 0.0f, 0.0f, 0.25f)
 
         val tess = Tessellator.getInstance()
         val vb = tess.getBuffer
@@ -141,23 +143,25 @@ object Replace extends MailOption
     override def tag = "/#f"
 
     override def change(mes: Message): Unit =
-        for m <- Messenger.messages.clone() do if m.location == mes.location then
-            Messenger.messages -= m
-            return
+        boundary:
+            for m <- Messenger.messages.clone() do if m.location == mes.location then
+                Messenger.messages -= m
+                break()
 
 object Combine extends MailOption
 :
     override def tag = "/#c"
 
     override def change(mes: Message): Unit =
-        for m <- Messenger.messages.clone() do if m.location == mes.location then
-            Messenger.messages -= m
-            mes.msg = m.msg+"\n"+mes.msg
-            return
+        boundary:
+            for m <- Messenger.messages.clone() do if m.location == mes.location then
+                Messenger.messages -= m
+                mes.msg = m.msg+"\n"+mes.msg
+                break()
 
 class Message
 :
-    def set(location:BlockPos, x: Double, y: Double, z: Double, msg: String) =
+    def set(location: BlockPos, x: Double, y: Double, z: Double, msg: String): Message =
         this.receivedOn = System.currentTimeMillis
         this.msg = msg
         this.location = location
@@ -166,7 +170,7 @@ class Message
         this.z = z
         this
 
-    def addY(y: Float) =
+    def addY(y: Float): Message =
         yOffset += y
         this
 

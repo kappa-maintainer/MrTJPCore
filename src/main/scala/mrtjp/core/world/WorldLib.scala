@@ -18,6 +18,9 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage
 import net.minecraftforge.common.IPlantable
 import net.minecraftforge.oredict.OreDictionary
 
+import scala.util.boundary
+import scala.util.boundary.break
+
 object WorldLib
 :
 //    def getTileEntity[T](world:IBlockAccess, pos:BlockPos, clazz:Class[T]):T =
@@ -97,49 +100,58 @@ object WorldLib
         val s = new ItemStack(state.getBlock)
         !s.isEmpty
 
-    def isLeafType(world:World, pos:BlockPos, state:IBlockState) =
+    def isLeafType(world: World, pos: BlockPos, state: IBlockState): Boolean =
         state.getBlock.isLeaves(state, world, pos) || (hasItem(state) && OreDictionary.getOreIDs(new ItemStack(state.getBlock)).contains(OreDictionary.getOreID("treeLeaves")))
-    def isWoodType(world: World, pos:BlockPos, state:IBlockState) =
+
+    def isWoodType(world: World, pos: BlockPos, state: IBlockState): Boolean =
         state.getBlock.isWood(world, pos) || (hasItem(state) && OreDictionary.getOreIDs(new ItemStack(state.getBlock)).contains(OreDictionary.getOreID("logWood")))
 
-    def isPlantType(world:World, pos:BlockPos, state:IBlockState) = state.getBlock match
-        case b:IGrowable => !b.isInstanceOf[BlockGrass]
-        case b:IPlantable => true
+    def isPlantType(world: World, pos: BlockPos, state: IBlockState): Boolean = state.getBlock match
+        case b: IGrowable => !b.isInstanceOf[BlockGrass]
+        case b: IPlantable => true
         case _ => state.getBlock.isFoliage(world, pos)
 
-    def isBlockSoft(world:World, pos:BlockPos, state:IBlockState) =
+    def isBlockSoft(world: World, pos: BlockPos, state: IBlockState): Boolean =
         state.getBlock.isAir(state, world, pos) || state.getBlock.isReplaceable(world, pos) ||
-                isLeafType(world, pos, state) || isPlantType(world, pos, state) ||
-                    state.getBlock.canBeReplacedByLeaves(state, world, pos)
+          isLeafType(world, pos, state) || isPlantType(world, pos, state) ||
+          state.getBlock.canBeReplacedByLeaves(state, world, pos)
 
-    def isAssociatedTreeBlock(world:World, pos:BlockPos, state:IBlockState) =
+    def isAssociatedTreeBlock(world: World, pos: BlockPos, state: IBlockState): Boolean =
         import net.minecraft.init.Blocks.*
         Seq(LOG, LOG2, LEAVES, LEAVES2, VINE, COCOA).contains(state.getBlock) || isLeafType(world, pos, state) || isWoodType(world, pos, state)
 
-    def findSurfaceHeight(world:World, pos:BlockPos) =
+    def findSurfaceHeight(world: World, pos: BlockPos): BlockPos =
         var pos2 = world.getHeight(pos).up()
-        while { pos2 = pos2.down() ; pos2.getY >= 0 && {val b = world.getBlockState(pos2); isBlockSoft(world, pos2, b) || isAssociatedTreeBlock(world, pos2, b)}} do ()
+        while {
+            pos2 = pos2.down(); pos2.getY >= 0 && {
+                val b = world.getBlockState(pos2); isBlockSoft(world, pos2, b) || isAssociatedTreeBlock(world, pos2, b)
+            }
+        } do ()
         pos2
 
-    def isBlockTouchingAir(world:World, pos:BlockPos):Boolean =
-        for s <- 0 until 6 do
-            if world.isAirBlock(pos.offset(EnumFacing.values.apply(s))) then
-                return true
+    def isBlockTouchingAir(world:World, pos:BlockPos): Boolean =
+        boundary:
+            for s <- 0 until 6 do
+                if world.isAirBlock(pos.offset(EnumFacing.values.apply(s))) then
+                    break(true)
+    
+            false
 
-        false
+    def isBlockUnderTree(world:World, pos:BlockPos): Boolean =
+        boundary:
+            if world.canBlockSeeSky(pos) then
+                break(false)
+            for h <- pos.getY until world.getHeight do
+                val pos2 = pos.up(h)
+                val b = world.getBlockState(pos2)
+                if isLeafType(world, pos2, b) || isAssociatedTreeBlock(world, pos2, b) then
+                    break(true)
+            false
 
-    def isBlockUnderTree(world:World, pos:BlockPos):Boolean =
-        if world.canBlockSeeSky(pos) then return false
-        for h <- pos.getY until world.getHeight do
-            val pos2 = pos.up(h)
-            val b = world.getBlockState(pos2)
-            if isLeafType(world, pos2, b) || isAssociatedTreeBlock(world, pos2, b) then return true
-        false
+    def getSkyLightValue(world: World, pos: BlockPos): Int =
+        world.getLightFor(EnumSkyBlock.SKY, pos) - world.getSkylightSubtracted
 
-    def getSkyLightValue(world:World, pos:BlockPos) =
-        world.getLightFor(EnumSkyBlock.SKY, pos)-world.getSkylightSubtracted
-
-    def getBlockLightValue(w:World, pos:BlockPos) = w.getLightFor(EnumSkyBlock.BLOCK, pos)
+    def getBlockLightValue(w: World, pos: BlockPos): Int = w.getLightFor(EnumSkyBlock.BLOCK, pos)
 
     private val noise = new PerlinNoiseGenerator(2576710L)
     def getWindSpeed(world:World, pos:BlockPos):Double =

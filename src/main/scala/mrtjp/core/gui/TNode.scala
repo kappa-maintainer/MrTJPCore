@@ -337,15 +337,15 @@ trait TNode extends Gui
                 if n == this then drawFront_Impl(mouse, rframe)
                 else n.drawFront(dp, rframe)
 
-    protected[gui] def translateTo(): Unit ={translate(position.x, position.y, 0)}//zPosition-(if (parent == null) 0 else parent.zPosition))}
-    protected[gui] def translateFrom(): Unit ={translate(-position.x, -position.y, 0)}// -(zPosition-(if (parent == null) 0 else parent.zPosition)))}
+    protected[gui] def translateTo(): Unit ={translate(position.x.toFloat, position.y.toFloat, 0.0f)}//zPosition-(if (parent == null) 0 else parent.zPosition))}
+    protected[gui] def translateFrom(): Unit ={translate(-position.x.toFloat, -position.y.toFloat, 0.0f)}// -(zPosition-(if (parent == null) 0 else parent.zPosition)))}
 
     protected[gui] def translateToScreen(): Unit =
         val Point(sx, sy) = parent.convertPointToScreen(Point.zeroPoint)
-        translate(-sx, -sy, 0)
+        translate(-sx.toFloat, -sy.toFloat, 0.0f)
     protected[gui] def translateFromScreen(): Unit =
         val Point(sx, sy) = parent.convertPointToScreen(Point.zeroPoint)
-        translate(sx, sy, 0)
+        translate(sx.toFloat, sy.toFloat, 0.0f)
 
     /** IMPLEMENTATION OVERRIDES **/
 

@@ -88,12 +88,12 @@ apply from: 'gradle/scripts/dependencies.gradle'
 
 repositories {
     maven {
-        name 'CleanroomMC Maven'
-        url 'https://maven.cleanroommc.com'
+        name = 'CleanroomMC Maven'
+        url = 'https://maven.cleanroommc.com'
     }
     maven {
-        name "outlandsReleases"
-        url "https://maven.arcseekers.com/releases"
+        name = "outlandsReleases"
+        url = "https://maven.arcseekers.com/releases"
     }
 }
 
@@ -161,7 +161,7 @@ tasks.remapJar {
 tasks.withType(ScalaCompile).configureEach {
     //scalaCompileOptions.additionalParameters = ['-new-syntax', '-rewrite']
     //scalaCompileOptions.additionalParameters = ['-indent', '-rewrite']
-    scalaCompileOptions.additionalParameters = ['-source','3.7-migration', '-rewrite']
+    //scalaCompileOptions.additionalParameters = ['-source','3.8-migration', '-rewrite']
     //scalaCompileOptions.additionalParameters = ['-source','3.4-migration', '-rewrite']
     //scalaCompileOptions.additionalParameters = ['-source','3.5-migration', '-rewrite']
     //scalaCompileOptions.additionalParameters = ['-source','3.6-migration', '-rewrite']

@@ -5,10 +5,9 @@
  */
 package mrtjp.core.util
 
-import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.BitSet
 import scala.collection.mutable.{BitSet as MBitSet, Builder as MBuilder}
-import scala.collection.{BuildFrom, IterableOnce, SortedSet, immutable}
+import scala.collection.{BuildFrom, IterableOnce, immutable}
 
 trait Enum
 {
@@ -67,7 +66,7 @@ trait Enum
     with immutable.SortedSet[EnumVal]
     with Serializable
     :
-        implicit def ordering = ValOrdering
+        implicit def ordering: ValOrdering.type = ValOrdering
         override def empty = ValSet.empty
 
         override def rangeImpl(from:Option[EnumVal], until:Option[EnumVal]) =
@@ -93,11 +92,11 @@ trait Enum
             def clear() = b.clear()
             def result() = new ValSet(b.toImmutable)
 
-        implicit def canBuildFrom: BuildFrom[ValSet, EnumVal, ValSet] = new CanBuildFrom[ValSet, EnumVal, ValSet]:
-            def newBuilder(from: ValSet) = newBuilder(from)
+        implicit def canBuildFrom: BuildFrom[ValSet, EnumVal, ValSet] = new BuildFrom[ValSet, EnumVal, ValSet]:
+            def newBuilder(from: ValSet) = ValSet.newBuilder
 
             def fromSpecific(from: ValSet)(it: IterableOnce[EnumVal]) =
-                val out = empty
-                it.foreach(out.excl)
-                out
+                val b = ValSet.newBuilder
+                it.iterator.foreach(b.addOne)
+                b.result()
 }

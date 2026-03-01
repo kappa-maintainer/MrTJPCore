@@ -166,7 +166,7 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
         enableDepth()
 
         if debugDrawFrames then
-            translate(-position.x, -position.y, 0)
+            translate(-position.x.toFloat, -position.y.toFloat, 0.0f)
             def render(node:TNode): Unit =
                 if !node.hidden then
                     val f = node.frame
@@ -177,4 +177,4 @@ class NodeGui(c:Container, w:Int, h:Int) extends GuiContainer(c) with TNode
                     GuiDraw.drawLine(absF.maxX, absF.y, absF.x, absF.y, 3, EnumColour.RED.rgba())
                 for c <- node.children do render(c)
             for c <- children do render(c)
-            translate(position.x, position.y, 0)
+            translate(position.x.toFloat, position.y.toFloat, 0.0f)

@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import java.util.{List as JList}
 
-import scala.collection.JavaConverters.*
+import scala.jdk.CollectionConverters.*
 
 class ItemCore extends Item
 :

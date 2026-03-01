@@ -17,7 +17,7 @@ import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper}
 import net.minecraft.client.util.ITooltipFlag.TooltipFlags.*
 import net.minecraft.item.ItemStack
 import net.minecraft.util.text.TextFormatting
-import scala.collection.JavaConverters.*
+import scala.jdk.CollectionConverters.*
 
 class ItemListNode extends TNode
 :
@@ -111,8 +111,8 @@ object ItemDisplayNode
 
         glItemPre()
         pushMatrix()
-        new Scale(size.width/16.0, size.height/16.0, 1)
-                .at(new Vector3(position.x, position.y, 0)).glApply()
+        new Scale(size.width/16.0d, size.height/16.0d, 1.0d)
+                .at(new Vector3(position.x.toDouble, position.y.toDouble, 0.0d)).glApply()
 
         renderItem.zLevel = (zPosition+10.0).toFloat
         enableDepth()
@@ -126,11 +126,11 @@ object ItemDisplayNode
         if drawNumber then
             val s =
                 if stack.getCount == 1 then ""
-                else if stack.getCount < 1000 then stack.getCount+""
-                else if stack.getCount < 100000 then stack.getCount/1000+"K"
-                else if stack.getCount < 1000000 then "0."+stack.getCount/100000+"M"
-                else stack.getCount/1000000+"M"
-            font.drawStringWithShadow(s, position.x+19-2-font.getStringWidth(s), position.y+6+3, 16777215)
+                else if stack.getCount < 1000 then s"${stack.getCount}"
+                else if stack.getCount < 100000 then s"${stack.getCount/1000}K"
+                else if stack.getCount < 1000000 then s"0.${stack.getCount/100000}M"
+                else s"${stack.getCount/1000000}M"
+            font.drawStringWithShadow(s, (position.x+19-2-font.getStringWidth(s)).toFloat, (position.y+6+3).toFloat, 16777215)
         popMatrix()
         glItemPost()
 
@@ -141,11 +141,10 @@ object ItemDisplayNode
         color(1.0F, 1.0F, 1.0F, 1.0F)
         RenderHelper.enableGUIStandardItemLighting()
         enableRescaleNormal()
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240/1.0F, 240/1.0F)
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F)
         disableDepth()
         disableLighting()
 
     def glItemPost(): Unit =
         enableDepth()
         popMatrix()
-

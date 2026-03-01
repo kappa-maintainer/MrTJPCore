@@ -10,7 +10,7 @@ import codechicken.lib.render.{CCModel, OBJParser}
 import codechicken.lib.vec.*
 import net.minecraft.util.ResourceLocation
 
-import scala.collection.JavaConverters.*
+import scala.jdk.CollectionConverters.*
 
 object VecLib
 :

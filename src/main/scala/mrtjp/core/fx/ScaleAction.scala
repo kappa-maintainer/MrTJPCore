@@ -37,9 +37,9 @@ class ScaleToAction extends ParticleAction
 
             //Check for resoulution errors - if any of the values have surpassed taret, then we are close enough
             val dscale2 = target.copy.subtract(s.scale)
-            if dscale2.x.signum == 0 || dscale2.x.signum != dscale.x.signum ||
-                    dscale2.y.signum == 0 || dscale2.y.signum != dscale.y.signum ||
-                    dscale2.z.signum == 0 || dscale2.z.signum != dscale.z.signum then
+            if dscale2.x.sign == 0 || dscale2.x.sign != dscale.x.sign ||
+                    dscale2.y.sign == 0 || dscale2.y.sign != dscale.y.sign ||
+                    dscale2.z.sign == 0 || dscale2.z.sign != dscale.z.sign then
                 isFinished = true
         else isFinished = true
 
@@ -52,10 +52,10 @@ class ScaleToAction extends ParticleAction
 
 class ScaleForAction extends ParticleAction
 {
-    var delta = Vector3.zero
+    var delta: Vector3 = Vector3.zero
     var duration = 0.0
 
-    override def canOperate(p:CoreParticle) = p.isInstanceOf[TScalableParticle]
+    override def canOperate(p: CoreParticle): Boolean = p.isInstanceOf[TScalableParticle]
 
     override def operate(p:CoreParticle, time:Double): Unit =
         val s = p.asInstanceOf[TScalableParticle]
@@ -64,5 +64,5 @@ class ScaleForAction extends ParticleAction
 
     override def compile(p:CoreParticle): Unit ={}
 
-    override def copy = ParticleAction.scaleFor(delta.x, delta.y, delta.z, duration)
+    override def copy: ParticleAction = ParticleAction.scaleFor(delta.x, delta.y, delta.z, duration)
 }

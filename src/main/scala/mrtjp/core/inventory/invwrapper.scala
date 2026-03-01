@@ -15,17 +15,25 @@ import net.minecraft.world.World
 import net.minecraftforge.items.CapabilityItemHandler.*
 import net.minecraftforge.items.IItemHandler
 
+import scala.util.boundary
+import scala.util.boundary.break
+
 object InvWrapper
 :
-    var wrappers = Seq[IInvWrapperRegister]()
+    var wrappers: Seq[IInvWrapperRegister] = Seq[IInvWrapperRegister]()
 
     def register(w:IInvWrapperRegister): Unit =
-        for wr <- wrappers do if wr.wrapperID == w.wrapperID then return
-        wrappers :+= w
+        boundary:
+            for wr <- wrappers do
+                if wr.wrapperID == w.wrapperID then
+                    break()
+            wrappers :+= w
 
     @deprecated
-    def wrap(inv:IInventory):InvWrapper =
-        for w <- wrappers do if w.matches(inv) then return w.create(inv)
+    def wrap(inv:IInventory): InvWrapper =
+        for w <- wrappers do
+            if w.matches(inv) then
+                w.create(inv)
         new VanillaWrapper(inv, false)
 
     //Used for wrapping inventory tiles
@@ -222,15 +230,16 @@ class CapWrapper(cap:IItemHandler) extends InvWrapper
         space
 
     override def hasSpaceForItem(item:ItemKey):Boolean =
-        for s <- 0 until cap.getSlots do
-            val stack = item.makeStack(item.getMaxStackSize)
-            val remaining = cap.insertItem(s, stack, true)
-            val inserted = stack.getCount-remaining.getCount
-            if inserted > 0 then
-                return true
-        false
+        boundary:
+            for s <- 0 until cap.getSlots do
+                val stack = item.makeStack(item.getMaxStackSize)
+                val remaining = cap.insertItem(s, stack, true)
+                val inserted = stack.getCount-remaining.getCount
+                if inserted > 0 then
+                    break(true)
+            false
 
-    override def getItemCount(item:ItemKey) =
+    override def getItemCount(item: ItemKey): Int =
         var count = 0
         for s <- 0 until cap.getSlots do
             val slotItem = ItemKeyStack.get(cap.getStackInSlot(s))
@@ -238,89 +247,92 @@ class CapWrapper(cap:IItemHandler) extends InvWrapper
                 count += slotItem.stackSize
         count
 
-    override def hasItem(item:ItemKey):Boolean =
-        for s <- 0 until cap.getSlots do
-            val slotItem = ItemKeyStack.get(cap.getStackInSlot(s))
-            if !slotItem.isEmpty && eq.matches(item, slotItem.key) then
-                return true
-        false
+    override def hasItem(item:ItemKey): Boolean =
+        boundary:
+            for s <- 0 until cap.getSlots do
+                val slotItem = ItemKeyStack.get(cap.getStackInSlot(s))
+                if !slotItem.isEmpty && eq.matches(item, slotItem.key) then
+                    break(true)
+            false
 
     override def injectItem(item:ItemKey, toAdd:Int):Int =
-        var itemsLeft = toAdd
-        for s <- 0 until cap.getSlots do
-            var amountToAdd = itemsLeft
-            amountToAdd = math.min(amountToAdd, item.getMaxStackSize)
-            amountToAdd = math.min(amountToAdd, cap.getSlotLimit(s))
-
-            val stackToAdd = item.makeStack(amountToAdd)
-            val leftoverStack = cap.insertItem(s, stackToAdd, false)
-
-            val amountInserted = stackToAdd.getCount-leftoverStack.getCount
-
-            itemsLeft -= amountInserted
-            if itemsLeft <= 0 then
-                return toAdd
-        toAdd-itemsLeft
+        boundary:
+            var itemsLeft = toAdd
+            for s <- 0 until cap.getSlots do
+                var amountToAdd = itemsLeft
+                amountToAdd = math.min(amountToAdd, item.getMaxStackSize)
+                amountToAdd = math.min(amountToAdd, cap.getSlotLimit(s))
+    
+                val stackToAdd = item.makeStack(amountToAdd)
+                val leftoverStack = cap.insertItem(s, stackToAdd, false)
+    
+                val amountInserted = stackToAdd.getCount-leftoverStack.getCount
+    
+                itemsLeft -= amountInserted
+                if itemsLeft <= 0 then
+                    break(toAdd)
+            toAdd-itemsLeft
 
     override def extractItem(item:ItemKey, toExtract:Int):Int =
-        var itemsLeft = toExtract
-        var didMatch = false
+        boundary:
+            var itemsLeft = toExtract
+            var didMatch = false
+    
+            for s <- 0 until cap.getSlots do
+                val stackInSlot = cap.getStackInSlot(s)
+                val keyInSlot = ItemKey.get(stackInSlot)
+                if eq.matches(item, keyInSlot) then
+                    var amountAvailable = stackInSlot.getCount
+                    if hidePerSlot then
+                        amountAvailable -= 1
+                    else if hidePerType && !didMatch then
+                        amountAvailable -= 1
+    
+                    val amountToExtract = math.min(itemsLeft, amountAvailable)
+                    val stack = cap.extractItem(s, amountToExtract, false)
+    
+                    itemsLeft -= stack.getCount
+                    if itemsLeft <= 0 then
+                        break(toExtract)
+    
+                    didMatch = true
+            toExtract-itemsLeft
 
-        for s <- 0 until cap.getSlots do
-            val stackInSlot = cap.getStackInSlot(s)
-            val keyInSlot = ItemKey.get(stackInSlot)
-            if eq.matches(item, keyInSlot) then
-                var amountAvailable = stackInSlot.getCount
-                if hidePerSlot then
-                    amountAvailable -= 1
-                else if hidePerType && !didMatch then
-                    amountAvailable -= 1
-
-                val amountToExtract = math.min(itemsLeft, amountAvailable)
-                val stack = cap.extractItem(s, amountToExtract, false)
-
-                itemsLeft -= stack.getCount
-                if itemsLeft <= 0 then
-                    return toExtract
-
-                didMatch = true
-        toExtract-itemsLeft
-
-    override def getAllItemStacks =
+    override def getAllItemStacks: Map[ItemKey, Int] =
         var items = Map[ItemKey, Int]()
         for s <- 0 until cap.getSlots do
             val inSlot = cap.getStackInSlot(s)
             if !inSlot.isEmpty then
                 val key = ItemKey.get(inSlot)
-                val stackSize = inSlot.getCount-(if hidePerSlot then 1 else 0)
+                val stackSize = inSlot.getCount - (if hidePerSlot then 1 else 0)
                 val currentSize = items.getOrElse(key, 0)
 
-                if !items.keySet.contains(key) then items += key -> (stackSize-(if hidePerType then 1 else 0))
-                else items += key -> (currentSize+stackSize)
+                if !items.keySet.contains(key) then items += key -> (stackSize - (if hidePerType then 1 else 0))
+                else items += key -> (currentSize + stackSize)
         items
 
 class VanillaWrapper(inv:IInventory, internalMode:Boolean) extends InvWrapper
 :
-    protected val sidedInv = inv match
-        case inv2:ISidedInventory => inv2
+    protected val sidedInv: ISidedInventory = inv match
+        case inv2: ISidedInventory => inv2
         case _ => null
     protected var side:EnumFacing = null
 
     var slots:Seq[Int] = 0 until inv.getSizeInventory
 
-    def setSlotsFromSide(s:Int) =
+    def setSlotsFromSide(s: Int): VanillaWrapper =
         if sidedInv != null then
             side = EnumFacing.values()(s)
-            slots = sidedInv.getSlotsForFace(side)
+            slots = sidedInv.getSlotsForFace(side).toIndexedSeq
         else setSlotsAll()
         this
 
-    def setSlotsFromRange(r:Range) =
+    def setSlotsFromRange(r: Range): VanillaWrapper =
         side = null
         slots = r
         this
 
-    def setSlotsAll() =
+    def setSlotsAll(): VanillaWrapper =
         side = null
         slots = (0 until inv.getSizeInventory)
         this
@@ -337,16 +349,19 @@ class VanillaWrapper(inv:IInventory, internalMode:Boolean) extends InvWrapper
         space
 
     override def hasSpaceForItem(item:ItemKey):Boolean =
-        val item2 = item.testStack
-        val slotStackLimit = math.min(inv.getInventoryStackLimit, item2.getMaxStackSize)
-        for slot <- slots do
-            val s = inv.getStackInSlot(slot)
-            if canInsertItem(slot, item2) then
-                if s.isEmpty then return true
-                else if InvWrapper.areItemsStackable(s, item2) && slotStackLimit-s.getCount > 0 then return true
-        false
+        boundary:
+            val item2 = item.testStack
+            val slotStackLimit = math.min(inv.getInventoryStackLimit, item2.getMaxStackSize)
+            for slot <- slots do
+                val s = inv.getStackInSlot(slot)
+                if canInsertItem(slot, item2) then
+                    if s.isEmpty then
+                        break(true)
+                    else if InvWrapper.areItemsStackable(s, item2) && slotStackLimit-s.getCount > 0 then
+                        break(true)
+            false
 
-    override def getItemCount(item:ItemKey) =
+    override def getItemCount(item: ItemKey): Int =
         var count = 0
 
         var first = true
@@ -354,62 +369,66 @@ class VanillaWrapper(inv:IInventory, internalMode:Boolean) extends InvWrapper
         for slot <- slots do
             val inSlot = inv.getStackInSlot(slot)
             if !inSlot.isEmpty && eq.matches(item, ItemKey.get(inSlot)) then
-                val toAdd = inSlot.getCount-(if hidePerSlot || hidePerType && first then 1 else 0)
+                val toAdd = inSlot.getCount - (if hidePerSlot || hidePerType && first then 1 else 0)
                 first = false
                 count += toAdd
         count
 
     override def hasItem(item:ItemKey):Boolean =
-        for slot <- slots do
-            val inSlot = inv.getStackInSlot(slot)
-            if !inSlot.isEmpty && eq.matches(item, ItemKey.get(inSlot)) then return true
-
-        false
+        boundary:
+            for slot <- slots do
+                val inSlot = inv.getStackInSlot(slot)
+                if !inSlot.isEmpty && eq.matches(item, ItemKey.get(inSlot)) then
+                    break(true)
+    
+            false
 
     override def injectItem(item:ItemKey, toAdd:Int):Int =
-        var itemsLeft = toAdd
-        val slotStackLimit = math.min(inv.getInventoryStackLimit, item.getMaxStackSize)
-
-        for pass <- Seq(0, 1) do for slot <- slots do if canInsertItem(slot, item.testStack) then
-            val inSlot = inv.getStackInSlot(slot)
-
-            if !inSlot.isEmpty && InvWrapper.areItemsStackable(item.testStack, inSlot) then
-                val fit = math.min(slotStackLimit-inSlot.getCount, itemsLeft)
-                inSlot.grow(fit)
-                itemsLeft -= fit
-                inv.setInventorySlotContents(slot, inSlot)
-            else if pass == 1 && inSlot.isEmpty then
-                val toInsert = item.makeStack(math.min(inv.getInventoryStackLimit, itemsLeft))
-                itemsLeft -= toInsert.getCount
-                inv.setInventorySlotContents(slot, toInsert)
-
-            if itemsLeft == 0 then return toAdd
-
-        toAdd-itemsLeft
+        boundary:
+            var itemsLeft = toAdd
+            val slotStackLimit = math.min(inv.getInventoryStackLimit, item.getMaxStackSize)
+    
+            for pass <- Seq(0, 1) do for slot <- slots do if canInsertItem(slot, item.testStack) then
+                val inSlot = inv.getStackInSlot(slot)
+    
+                if !inSlot.isEmpty && InvWrapper.areItemsStackable(item.testStack, inSlot) then
+                    val fit = math.min(slotStackLimit-inSlot.getCount, itemsLeft)
+                    inSlot.grow(fit)
+                    itemsLeft -= fit
+                    inv.setInventorySlotContents(slot, inSlot)
+                else if pass == 1 && inSlot.isEmpty then
+                    val toInsert = item.makeStack(math.min(inv.getInventoryStackLimit, itemsLeft))
+                    itemsLeft -= toInsert.getCount
+                    inv.setInventorySlotContents(slot, toInsert)
+    
+                if itemsLeft == 0 then break(toAdd)
+    
+            toAdd-itemsLeft
 
     override def extractItem(item:ItemKey, toExtract:Int):Int =
-        if toExtract <= 0 then return 0
-        var left = toExtract
-        var first = true
-        for slot <- slots do if canExtractItem(slot, item.testStack) then
-            val inSlot = inv.getStackInSlot(slot)
-            if !inSlot.isEmpty && eq.matches(item, ItemKey.get(inSlot)) then //TODO extraction shouldnt rely on eq matches..?
-                left -= inv.decrStackSize(slot, math.min(left, inSlot.getCount-(if hidePerSlot || hidePerType&&first then 1 else 0))).getCount
-                first = false
-            if left <= 0 then return toExtract
-        toExtract - left
+        boundary:
+            if toExtract <= 0 then return 0
+            var left = toExtract
+            var first = true
+            for slot <- slots do if canExtractItem(slot, item.testStack) then
+                val inSlot = inv.getStackInSlot(slot)
+                if !inSlot.isEmpty && eq.matches(item, ItemKey.get(inSlot)) then //TODO extraction shouldnt rely on eq matches..?
+                    left -= inv.decrStackSize(slot, math.min(left, inSlot.getCount-(if hidePerSlot || hidePerType&&first then 1 else 0))).getCount
+                    first = false
+                if left <= 0 then break(toExtract)
+            toExtract - left
 
-    override def getAllItemStacks =
+    override def getAllItemStacks: Map[ItemKey, Int] =
         var items = Map[ItemKey, Int]()
         for slot <- slots do
             val inSlot = inv.getStackInSlot(slot)
             if !inSlot.isEmpty then
                 val key = ItemKey.get(inSlot)
-                val stackSize = inSlot.getCount-(if hidePerSlot then 1 else 0)
+                val stackSize = inSlot.getCount - (if hidePerSlot then 1 else 0)
                 val currentSize = items.getOrElse(key, 0)
 
-                if !items.keySet.contains(key) then items += key -> (stackSize-(if hidePerType then 1 else 0))
-                else items += key -> (currentSize+stackSize)
+                if !items.keySet.contains(key) then items += key -> (stackSize - (if hidePerType then 1 else 0))
+                else items += key -> (currentSize + stackSize)
         items
 
     protected def canInsertItem(slot:Int, item:ItemStack):Boolean =

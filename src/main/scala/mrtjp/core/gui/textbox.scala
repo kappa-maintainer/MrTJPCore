@@ -11,6 +11,9 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.util.ChatAllowedCharacters
 import org.lwjgl.input.Keyboard
 
+import scala.util.boundary
+import scala.util.boundary.break
+
 /**
   * A node representing a simple text box used to type in text.
   *
@@ -50,11 +53,11 @@ class SimpleTextboxNode(x:Int, y:Int, w:Int, h:Int, tq:String) extends TNode
 
     /** A callback function called when the text changes. */
     var textChangedDelegate = {() => }
-    /** A callback function called when the `RETURN` key is pressed while typing in the text box. */
-    var textReturnDelegate = {() => }
+  /** A callback function called when the `RETURN` key is pressed while typing in the text box. */
+    var textReturnDelegate: () => Unit = { () => }
 
-    /** A callback function called when the focus of the test box changes. */
-    var focusChangeDelegate = {() => }
+  /** A callback function called when the focus of the test box changes. */
+    var focusChangeDelegate: () => Unit = { () => }
 
     /** Used internally to render the blinking cursor. */
     private var cursorCounter = 0
@@ -86,24 +89,26 @@ class SimpleTextboxNode(x:Int, y:Int, w:Int, h:Int, tq:String) extends TNode
 
     override def update_Impl(): Unit ={cursorCounter += 1}
 
-    override def keyPressed_Impl(c:Char, keycode:Int, consumed:Boolean):Boolean =
+    override def keyPressed_Impl(c:Char, keycode:Int, consumed:Boolean): Boolean =
+      boundary:
         if enabled && focused && !consumed then
             if keycode == 1 then//esc
                 setFocused(false)
-                return true
-
-            if c == '\u0016' then //paste
+                break(true)
+            else if c == '\u0016' then //paste
                 val s = GuiScreen.getClipboardString
-                if s == null || s.isEmpty then return true
-                for c <- s do if !tryAddChar(c) then return true
-
-            if keycode == Keyboard.KEY_RETURN then //enter
+                if s == null || s.isEmpty then
+                  break(true)
+                for c <- s do if !tryAddChar(c) then
+                  break(true)
+            else if keycode == Keyboard.KEY_RETURN then //enter
                 setFocused(false)
                 textReturnDelegate()
-                return true
-
-            if keycode == Keyboard.KEY_BACK then tryBackspace() else tryAddChar(c)
-
+                break(true)
+            else if keycode == Keyboard.KEY_BACK then
+              tryBackspace()
+            else
+              tryAddChar(c)
             true
         else false
 
@@ -119,12 +124,12 @@ class SimpleTextboxNode(x:Int, y:Int, w:Int, h:Int, tq:String) extends TNode
         true
 
     private def tryBackspace():Boolean =
-        if !text.isEmpty then
+        if text.nonEmpty then
             setText(text.substring(0, text.length-1))
             true
         else false
 
-    override def mouseClicked_Impl(p:Point, button:Int, consumed:Boolean) =
+    override def mouseClicked_Impl(p:Point, button:Int, consumed:Boolean): Boolean =
         if !consumed && enabled && rayTest(p) then
             setFocused(true)
             if button == 1 then setText("")

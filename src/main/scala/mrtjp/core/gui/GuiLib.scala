@@ -36,21 +36,21 @@ object GuiLib
         createGrid(x, y, w, h, dx+18, dy+18)
 
     /**
-      * Creates a list of Int tuples representing (x, y) coordinates. These points represent the top-left corner of
-      * the boxes of the created grid.
-      *
-      * @param x X pos of grid.
-      * @param y Y pos of grid.
-      * @param w Width of grid.
-      * @param h Height of grid.
-      * @param dx X spacing of slots. If zero, all x coordinates will be the same.
-      * @param dy Y spacing of slots. If zero, all y coordinates will be the same.
-      * @return Sequence of tuples representing (x, y) coordinates.
-      */
-    def createGrid(x:Int, y:Int, w:Int, h:Int, dx:Int, dy:Int) =
+     * Creates a list of Int tuples representing (x, y) coordinates. These points represent the top-left corner of
+     * the boxes of the created grid.
+     *
+     * @param x  X pos of grid.
+     * @param y  Y pos of grid.
+     * @param w  Width of grid.
+     * @param h  Height of grid.
+     * @param dx X spacing of slots. If zero, all x coordinates will be the same.
+     * @param dy Y spacing of slots. If zero, all y coordinates will be the same.
+     * @return Sequence of tuples representing (x, y) coordinates.
+     */
+    def createGrid(x: Int, y: Int, w: Int, h: Int, dx: Int, dy: Int): Seq[(Int, Int)] =
         var grid = Seq[(Int, Int)]()
         for iy <- 0 until h do for ix <- 0 until w do
-            grid :+= ((x+ix*dx) -> (y+iy*dy))
+            grid :+= ((x + ix * dx) -> (y + iy * dy))
         grid
 
     /**
@@ -118,34 +118,34 @@ object GuiLib
         TextureUtils.changeTexture(guiExtras)
 
         GuiDraw.gui.setZLevel(zLevel)
-        color(1, 1, 1, 1)
+        color(1.0f, 1.0f, 1.0f, 1.0f)
         pushMatrix()
-        translate(x+2, y+2, 0)
-        scale(width-4, height-4, 0)
+        translate((x+2).toFloat, (y+2).toFloat, 0.0f)
+        scale((width-4).toFloat, (height-4).toFloat, 0.0f)
         GuiDraw.drawTexturedModalRect(0, 0, u+19, v, 1, 1)
         popMatrix()
         if top then
             pushMatrix()
-            translate(x+3, y, 0)
-            scale(width-6, 1, 0)
+            translate((x+3).toFloat, y.toFloat, 0.0f)
+            scale((width-6).toFloat, 1.0f, 0.0f)
             GuiDraw.drawTexturedModalRect(0, 0, u+4, v, 1, 3)
             popMatrix()
         if bottom then
             pushMatrix()
-            translate(x+3, y+height-3, 0)
-            scale(width-6, 1, 0)
+            translate((x+3).toFloat, (y+height-3).toFloat, 0.0f)
+            scale((width-6).toFloat, 1.0f, 0.0f)
             GuiDraw.drawTexturedModalRect(0, 0, u+14, v, 1, 3)
             popMatrix()
         if left then
             pushMatrix()
-            translate(x, y+3, 0)
-            scale(1, height-6, 0)
+            translate(x.toFloat, (y+3).toFloat, 0.0f)
+            scale(1.0f, (height-6).toFloat, 0.0f)
             GuiDraw.drawTexturedModalRect(0, 0, u, v+4, 3, 1)
             popMatrix()
         if right then
             pushMatrix()
-            translate(x+width-3, y+3, 0)
-            scale(1, height-6, 0)
+            translate((x+width-3).toFloat, (y+3).toFloat, 0.0f)
+            scale(1.0f, (height-6).toFloat, 0.0f)
             GuiDraw.drawTexturedModalRect(0, 0, u+8, v, 3, 1)
             popMatrix()
 

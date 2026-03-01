@@ -5,7 +5,7 @@
  */
 package mrtjp.core.gui
 
-import java.util.{List as JList}
+import java.util.List as JList
 
 import mrtjp.core.inventory.InvWrapper
 import net.minecraft.client.Minecraft
@@ -14,30 +14,29 @@ import net.minecraft.inventory.*
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
-import scala.collection.mutable.{Buffer as MBuffer}
-import scala.collection.JavaConverters.*
+import scala.collection.mutable.Buffer as MBuffer
+import scala.jdk.CollectionConverters.*
 
 class NodeContainer extends Container
 :
-    var startWatchDelegate = {(p:EntityPlayer) => }
-    var stopWatchDelegate = {(p:EntityPlayer) => }
-    var slotChangeDelegate = {(slot:Int) => }
+    var startWatchDelegate: EntityPlayer => Unit = { (p: EntityPlayer) => }
+    var stopWatchDelegate: EntityPlayer => Unit = { (p: EntityPlayer) => }
+    var slotChangeDelegate: Int => Unit = { (slot: Int) => }
 
     def slots:MBuffer[TSlot3] = inventorySlots.asInstanceOf[JList[TSlot3]].asScala
 
     override def canInteractWith(player:EntityPlayer) = true
 
-    override def canDragIntoSlot(slot:Slot) = slot match
-        case s:TSlot3 => !s.phantomSlot
+    override def canDragIntoSlot(slot: Slot): Boolean = slot match
+        case s: TSlot3 => !s.phantomSlot
         case _ => super.canDragIntoSlot(slot)
 
-    override def addSlotToContainer(slot:Slot) =
+    override def addSlotToContainer(slot: Slot): Slot =
         if !slot.isInstanceOf[TSlot3] then
             throw new IllegalArgumentException("NodeContainers can only except slots of type Slot3")
         super.addSlotToContainer(slot)
 
-        slot.asInstanceOf[TSlot3].slotChangeDelegate2 =
-                {() => slotChangeDelegate(slot.slotNumber)}
+        slot.asInstanceOf[TSlot3].slotChangeDelegate2 = { () => slotChangeDelegate(slot.slotNumber) }
         slot
 
     @SideOnly(Side.CLIENT)
@@ -165,7 +164,7 @@ class NodeContainer extends Container
 
         false
 
-    def tryMergeItemStack(stack:ItemStack, start:Int, end:Int, reverse:Boolean) =
+    def tryMergeItemStack(stack:ItemStack, start:Int, end:Int, reverse:Boolean): Boolean =
         var flag1 = false
         var k = if reverse then end-1 else start
 
@@ -234,13 +233,13 @@ class Slot3(inv:IInventory, i:Int, x:Int, y:Int) extends Slot(inv, i, x, y) with
 
 trait TSlot3 extends Slot
 :
-    var slotChangeDelegate = {() =>}
-    var canRemoveDelegate = {() => !phantomSlot}
-    var canPlaceDelegate = {(stack:ItemStack) => inventory.isItemValidForSlot(getSlotIndex, stack)}
-    var slotLimitCalculator = {() => inventory.getInventoryStackLimit}
+    var slotChangeDelegate: () => Unit = { () => }
+    var canRemoveDelegate: () => Boolean = { () => !phantomSlot }
+    var canPlaceDelegate: ItemStack => Boolean = { (stack: ItemStack) => inventory.isItemValidForSlot(getSlotIndex, stack) }
+    var slotLimitCalculator: () => Int = { () => inventory.getInventoryStackLimit }
 
     var phantomSlot = false
 
-    var slotChangeDelegate2 = {() =>} //used for container change delegate, do not set yourself!
+    var slotChangeDelegate2: () => Unit = { () => } //used for container change delegate, do not set yourself!
 
     //additional methods required for this trait to work are located in class Slot3

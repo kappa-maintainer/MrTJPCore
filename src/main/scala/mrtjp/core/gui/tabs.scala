@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.item.ItemStack
 
 import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConverters.*
+import scala.jdk.CollectionConverters.*
 
 /**
   * Represents an expandable tab that sits on the right edge of a GUI window. Expands when clicked on.

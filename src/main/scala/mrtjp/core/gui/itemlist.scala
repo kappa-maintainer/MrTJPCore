@@ -5,8 +5,6 @@
  */
 package mrtjp.core.gui
 
-import java.util.{List as JList}
-
 import codechicken.lib.colour.EnumColour
 import codechicken.lib.gui.GuiDraw
 import codechicken.lib.util.FontUtils
@@ -15,8 +13,8 @@ import mrtjp.core.vec.{Point, Rect, Size}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager.*
+import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper, RenderItem}
 import net.minecraft.client.util.ITooltipFlag.TooltipFlags.*
-import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper}
 import net.minecraft.item.ItemStack
 
 class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
@@ -43,7 +41,7 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
 
     private var filter = ""
 
-    def getSelected = selection
+    def getSelected: ItemKeyStack = selection
 
     private var displayList = Vector[ItemKeyStack]()
 
@@ -74,8 +72,7 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
 
     def filterAllows(stack:ItemKeyStack):Boolean =
         def stringMatch(name:String, filter:String):Boolean =
-            for s <- filter.split(" ") do if !name.contains(s) then return false
-            true
+            filter.split(" ").forall(name.contains)
 
         if stringMatch(stack.key.getName.toLowerCase, filter) then true
         else false
@@ -102,7 +99,7 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
         FontUtils.drawCenteredString(
             "Page: "+(currentPage+1)+"/"+(pagesNeeded+1), x+(size.width/2), y+frame.height+6, EnumColour.BLACK.rgb)
 
-    override def mouseClicked_Impl(p:Point, button:Int, consumed:Boolean) =
+    override def mouseClicked_Impl(p: Point, button: Int, consumed: Boolean): Boolean =
         if !consumed && frame.contains(p) then
             xLast = p.x
             yLast = p.y
@@ -169,7 +166,7 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
         color(1.0F, 1.0F, 1.0F, 1.0F)
         RenderHelper.enableGUIStandardItemLighting()
         enableRescaleNormal()
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240/1.0F, 240/1.0F)
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F)
         disableDepth()
         disableLighting()
 
@@ -177,25 +174,25 @@ class NodeItemList(x:Int, y:Int, w:Int, h:Int) extends TNode
         enableDepth()
         popMatrix()
 
-    protected var renderItem = Minecraft.getMinecraft.getRenderItem
+    protected var renderItem: RenderItem = Minecraft.getMinecraft.getRenderItem
     private def inscribeItemStack(xPos:Int, yPos:Int, stack:ItemStack): Unit =
         val font = stack.getItem.getFontRenderer(stack) match
             case null => getFontRenderer
             case r => r
 
-        renderItem.zLevel = 100.0F
+        renderItem.zLevel = 100.0f
         enableDepth()
         enableLighting()
         renderItem.renderItemAndEffectIntoGUI(stack, xPos, yPos)
         renderItem.renderItemOverlayIntoGUI(font, stack, xPos, yPos, "")
         disableLighting()
         disableDepth()
-        renderItem.zLevel = 0.0F
+        renderItem.zLevel = 0.0f
 
         var s:String = null
         if stack.getCount == 1 then s = ""
-        else if stack.getCount < 1000 then s = stack.getCount+""
-        else if stack.getCount < 100000 then s = stack.getCount/1000+"K"
-        else if stack.getCount < 1000000 then s = "0M"+stack.getCount/100000
-        else s = stack.getCount/1000000+"M"
-        font.drawStringWithShadow(s, xPos+19-2-font.getStringWidth(s), yPos+6+3, 16777215)
+        else if stack.getCount < 1000 then s = s"${stack.getCount}"
+        else if stack.getCount < 100000 then s = s"${stack.getCount/1000}K"
+        else if stack.getCount < 1000000 then s = s"0M${stack.getCount/100000}"
+        else s = s"${stack.getCount/1000000}M"
+        font.drawStringWithShadow(s, (xPos+19-2-font.getStringWidth(s)).toFloat, (yPos+6+3).toFloat, 16777215)
