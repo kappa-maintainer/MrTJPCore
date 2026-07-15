@@ -6,9 +6,9 @@ plugins {
     id 'scala'
     id 'java-library'
     id 'maven-publish'
-    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1.10'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
     id 'org.jetbrains.changelog' version '2.2.1'
-    id 'xyz.wagyourtail.unimined' version '1.4.10-kappa'
+    id 'xyz.wagyourtail.unimined' version '1.4.26-kappa'
 }
 
 apply from: 'gradle/scripts/helpers.gradle'
@@ -40,7 +40,7 @@ scala {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
     if (propertyBool('generate_sources_jar')) {
         withSourcesJar()
@@ -67,7 +67,7 @@ unimined.minecraft {
         if (propertyBool('use_access_transformer')) {
             accessTransformer 'src/main/resources/META-INF/' +  propertyString('access_transformer_locations')
         }
-        loader "0.4.4-alpha"
+        loader "0.5.17-alpha"
         runs.auth.username = minecraft_username
         runs.all {
             if (hasProperty("extra_jvm_args")) {
