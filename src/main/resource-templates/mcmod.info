@@ -3,7 +3,7 @@
 		"modid": "mrtjpcore",
 		"name": "MrTJPCore Rescaled",
 		"description": "Core libs and utilities",
-		"version": "${mod_version}",
+		"version": "{{ mod_version }}",
 		"mcversion": "1.12.2",
 		"url": "...",
 		"authors": [

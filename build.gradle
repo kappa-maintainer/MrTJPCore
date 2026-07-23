@@ -9,6 +9,7 @@ plugins {
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
     id 'org.jetbrains.changelog' version '2.2.1'
     id 'xyz.wagyourtail.unimined' version '1.4.26-kappa'
+    id 'net.kyori.blossom' version '2.2.0'
 }
 
 apply from: 'gradle/scripts/helpers.gradle'
@@ -16,6 +17,7 @@ apply from: 'gradle/scripts/helpers.gradle'
 // Early Assertions
 assertProperty 'mod_version'
 assertProperty 'root_package'
+assertProperty 'mod_id'
 assertProperty 'mod_name'
 
 assertSubProperties 'use_access_transformer', 'access_transformer_locations'
@@ -31,11 +33,11 @@ version = propertyString('mod_version')
 group = propertyString('root_package')
 
 base {
-    archivesName.set(propertyString('mod_name'))
+    archivesName.set(propertyString('mod_id'))
 }
 
 scala {
-    scalaVersion = '3.8.2'
+    scalaVersion = '3.8.4'
 }
 
 java {
@@ -105,17 +107,20 @@ dependencies {
 
 
 processResources {
-
     inputs.property 'mod_version', propertyString('mod_version')
+}
 
-    def filterList = ['mcmod.info']
-
-    filesMatching(filterList) { fcd ->
-        fcd.expand(
-                'mod_version': propertyString('mod_version'),
-        )
+sourceSets {
+    main {
+        blossom {
+            scalaSources {
+                property('mod_version', propertyString('mod_version'))
+            }
+            resources {
+                property('mod_version', propertyString('mod_version'))
+            }
+        }
     }
-
 }
 
 jar {
@@ -169,18 +174,6 @@ tasks.withType(ScalaCompile).configureEach {
 }
 
 
-String parserChangelog() {
-    if (!file('CHANGELOG.md').exists()) {
-        throw new GradleException('publish_with_changelog is true, but CHANGELOG.md does not exist in the workspace!')
-    }
-    String parsedChangelog = changelog.renderItem(
-            changelog.get(propertyString('mod_version')).withHeader(false).withEmptySections(false),
-            Changelog.OutputType.MARKDOWN)
-    if (parsedChangelog.isEmpty()) {
-        throw new GradleException('publish_with_changelog is true, but the changelog for the latest version is empty!')
-    }
-    return parsedChangelog
-}
 
 
 tasks.withType(JavaCompile).configureEach {

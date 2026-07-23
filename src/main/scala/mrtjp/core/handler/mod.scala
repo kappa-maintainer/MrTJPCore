@@ -5,13 +5,14 @@
  */
 package mrtjp.core.handler
 
+import mrtjp.core.Reference
 import mrtjp.core.data.{ModConfig, SpecialConfigGui, TModGuiFactory}
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
 import org.apache.logging.log4j.LogManager
 
-@Mod(modid = "mrtjpcore", useMetadata = true, modLanguage = "scala", guiFactory = "mrtjp.core.handler.GuiConfigFactory")
+@Mod(modid = "mrtjpcore", name = "MrTJPCore Rescaled", version = Reference.VERSION, useMetadata = true, modLanguage = "scala", guiFactory = "mrtjp.core.handler.GuiConfigFactory")
 object MrTJPCoreMod
 :
     val log = LogManager.getFormatterLogger("MrTJPCore")
