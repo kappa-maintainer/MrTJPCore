@@ -69,7 +69,7 @@ unimined.minecraft {
         if (propertyBool('use_access_transformer')) {
             accessTransformer 'src/main/resources/META-INF/' +  propertyString('access_transformer_locations')
         }
-        loader "0.5.17-alpha"
+        loader "0.6.5-alpha"
         runs.auth.username = minecraft_username
         runs.all {
             if (hasProperty("extra_jvm_args")) {
