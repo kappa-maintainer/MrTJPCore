@@ -36,7 +36,7 @@ import scala.jdk.CollectionConverters.*
 
 object MultiTileBlock
 :
-    val TILE_INDEX:IProperty[Integer] = PropertyInteger.create("tile_idx", 0, 15)
+    val TILE_INDEX: IProperty[Integer] = PropertyInteger.create("tile_idx", 0, 15)
 
 class MultiTileBlock(mat:Material) extends Block(mat)
 :
@@ -63,7 +63,7 @@ class MultiTileBlock(mat:Material) extends Block(mat)
 
     override def createTileEntity(world:World, state:IBlockState): TileEntity =
         var t:MTBlockTile = null
-        try { t = tiles(getMetaFromState(state)).getConstructor(Array.empty[Class[?]](0)).newInstance() }
+        try { t = tiles(getMetaFromState(state)).getConstructor().newInstance() }
         catch {case e:Exception => e.printStackTrace()}
         t
 
